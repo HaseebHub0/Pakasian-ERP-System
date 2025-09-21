@@ -1,154 +1,282 @@
-'use client';
+'use client'
 
-import { GatekeeperOnly } from '@/components/RoleGuard';
-import { useAuth } from '@/hooks/useAuth';
+import { useAuth } from '@/hooks/useAuth'
+import { useState, useEffect } from 'react'
+import Link from 'next/link'
 
 export default function GatekeeperDashboard() {
-  const { user } = useAuth();
+  const { user } = useAuth()
+  const [stats, setStats] = useState({
+    trucksInside: 0,
+    todayEntries: 0,
+    todayExits: 0,
+    pendingMovements: 0
+  })
+
+  useEffect(() => {
+    // Fetch dashboard stats
+    fetchStats()
+  }, [])
+
+  const fetchStats = async () => {
+    try {
+      const token = localStorage.getItem('accessToken')
+      
+      // Fetch trucks inside
+      const trucksResponse = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/trucks/status/inside`, {
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      })
+      const trucksData = await trucksResponse.json()
+      
+      // Fetch today's entries
+      const today = new Date().toISOString().split('T')[0]
+      const entriesResponse = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/trucks?start_date=${today}&end_date=${today}`, {
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      })
+      const entriesData = await entriesResponse.json()
+      
+      setStats({
+        trucksInside: trucksData.trucks?.length || 0,
+        todayEntries: entriesData.trucks?.filter((t: { entry_type: string }) => t.entry_type === 'IN').length || 0,
+        todayExits: entriesData.trucks?.filter((t: { entry_type: string }) => t.entry_type === 'OUT').length || 0,
+        pendingMovements: 0 // This would come from stock movements
+      })
+    } catch (error) {
+      console.error('Error fetching stats:', error)
+    }
+  }
+
+  if (!user || user.role !== 'gatekeeper') {
+    return (
+      <div className="bg-white rounded-lg shadow p-6">
+        <div className="text-center">
+          <h1 className="text-2xl font-bold text-red-600 mb-4">Access Denied</h1>
+          <p className="text-gray-600">You don't have permission to access this page.</p>
+        </div>
+      </div>
+    )
+  }
 
   return (
-    <GatekeeperOnly fallback={<div className="text-center text-red-600">Access Denied - Gatekeeper Only</div>}>
-      <div className="space-y-6">
-        <div className="bg-white shadow rounded-lg p-6">
-          <h1 className="text-3xl font-bold text-gray-900 mb-4">
-            Warehouse Gate Control
-          </h1>
-          <p className="text-gray-600 mb-6">
-            Welcome, {user?.name}! Manage truck entries, exits, and stock movements at the warehouse gate.
-          </p>
-          
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-            <div className="bg-blue-50 p-6 rounded-lg text-center">
-              <h3 className="text-2xl font-bold text-blue-900">3</h3>
-              <p className="text-blue-700">Pending Trucks</p>
-              <span className="text-sm text-blue-600">Waiting for entry</span>
+    <div className="min-h-screen bg-gray-100 p-4">
+      <div className="max-w-7xl mx-auto space-y-6">
+        {/* Welcome Section */}
+        <div className="bg-white border-2 border-black rounded-lg shadow-lg p-6">
+          <div className="flex flex-col md:flex-row items-center justify-between">
+            <div className="text-center md:text-left mb-4 md:mb-0">
+              <h1 className="text-3xl font-bold text-black mb-2">Welcome Gatekeeper</h1>
+              <p className="text-gray-600 text-lg">Manage Trucks and Stock Movements</p>
+              <p className="text-gray-500 text-sm mt-1">Logged in as: {user.name}</p>
             </div>
-
-            <div className="bg-green-50 p-6 rounded-lg text-center">
-              <h3 className="text-2xl font-bold text-green-900">15</h3>
-              <p className="text-green-700">Today's Movements</p>
-              <span className="text-sm text-green-600">Inbound & Outbound</span>
-            </div>
-
-            <div className="bg-purple-50 p-6 rounded-lg text-center">
-              <h3 className="text-2xl font-bold text-purple-900">75%</h3>
-              <p className="text-purple-700">Warehouse Capacity</p>
-              <span className="text-sm text-purple-600">Current usage</span>
-            </div>
-
-            <div className="bg-orange-50 p-6 rounded-lg text-center">
-              <h3 className="text-2xl font-bold text-orange-900">Active</h3>
-              <p className="text-orange-700">Warehouse Status</p>
-              <span className="text-sm text-green-600">All systems operational</span>
+            <div className="text-center">
+              <div className="text-4xl font-bold text-red-600">{stats.trucksInside}</div>
+              <div className="text-gray-600 font-medium">Trucks Inside</div>
             </div>
           </div>
+        </div>
 
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
-            <div className="bg-white border rounded-lg p-6">
-              <h3 className="text-lg font-semibold text-gray-900 mb-4">Truck Management</h3>
-              <div className="space-y-3">
-                <button className="w-full bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700">
-                  Record Truck Entry
-                </button>
-                <button className="w-full bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700">
-                  Record Truck Exit
-                </button>
-                <button className="w-full bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">
-                  View Pending Trucks
-                </button>
-                <button className="w-full bg-purple-600 text-white px-4 py-2 rounded hover:bg-purple-700">
-                  Truck History
-                </button>
-              </div>
-            </div>
-
-            <div className="bg-white border rounded-lg p-6">
-              <h3 className="text-lg font-semibold text-gray-900 mb-4">Stock Movements</h3>
-              <div className="space-y-3">
-                <button className="w-full bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700">
-                  Record Inbound Goods
-                </button>
-                <button className="w-full bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700">
-                  Record Outbound Goods
-                </button>
-                <button className="w-full bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">
-                  View Movement History
-                </button>
-                <button className="w-full bg-purple-600 text-white px-4 py-2 rounded hover:bg-purple-700">
-                  Pending Movements
-                </button>
+        {/* Stats Cards */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+          <div className="bg-white border-2 border-black rounded-lg shadow-lg p-6">
+            <div className="flex items-center justify-center">
+              <div className="text-center">
+                <div className="w-16 h-16 bg-green-100 border-2 border-green-500 rounded-full flex items-center justify-center mx-auto mb-3">
+                  <svg className="h-8 w-8 text-green-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                  </svg>
+                </div>
+                <p className="text-sm font-bold text-black">Trucks Inside</p>
+                <p className="text-3xl font-bold text-red-600">{stats.trucksInside}</p>
               </div>
             </div>
           </div>
 
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-            <div className="bg-white border rounded-lg p-6">
-              <h3 className="text-lg font-semibold text-gray-900 mb-4">Recent Truck Entries</h3>
-              <div className="space-y-3">
-                <div className="flex justify-between items-center p-3 bg-gray-50 rounded">
-                  <div>
-                    <span className="font-medium">TRUCK-001</span>
-                    <p className="text-sm text-gray-600">Ahmed Khan - KHI-1234</p>
-                  </div>
-                  <span className="text-sm text-gray-500">09:30</span>
+          <div className="bg-white border-2 border-black rounded-lg shadow-lg p-6">
+            <div className="flex items-center justify-center">
+              <div className="text-center">
+                <div className="w-16 h-16 bg-green-100 border-2 border-green-500 rounded-full flex items-center justify-center mx-auto mb-3">
+                  <svg className="h-8 w-8 text-green-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+                  </svg>
                 </div>
-                <div className="flex justify-between items-center p-3 bg-gray-50 rounded">
-                  <div>
-                    <span className="font-medium">TRUCK-002</span>
-                    <p className="text-sm text-gray-600">Hassan Ali - KHI-5678</p>
-                  </div>
-                  <span className="text-sm text-gray-500">11:15</span>
-                </div>
-                <div className="flex justify-between items-center p-3 bg-gray-50 rounded">
-                  <div>
-                    <span className="font-medium">TRUCK-003</span>
-                    <p className="text-sm text-gray-600">Usman Khan - KHI-9012</p>
-                  </div>
-                  <span className="text-sm text-gray-500">14:20</span>
-                </div>
-              </div>
-            </div>
-
-            <div className="bg-white border rounded-lg p-6">
-              <h3 className="text-lg font-semibold text-gray-900 mb-4">Recent Stock Movements</h3>
-              <div className="space-y-3">
-                <div className="flex justify-between items-center p-3 bg-gray-50 rounded">
-                  <div>
-                    <span className="font-medium text-green-600">INB-001</span>
-                    <p className="text-sm text-gray-600">Protein Nimko 100g - 500 packets</p>
-                  </div>
-                  <span className="text-sm text-gray-500">09:30</span>
-                </div>
-                <div className="flex justify-between items-center p-3 bg-gray-50 rounded">
-                  <div>
-                    <span className="font-medium text-red-600">OUT-001</span>
-                    <p className="text-sm text-gray-600">Salted Chips 50g - 200 packets</p>
-                  </div>
-                  <span className="text-sm text-gray-500">11:15</span>
-                </div>
-                <div className="flex justify-between items-center p-3 bg-gray-50 rounded">
-                  <div>
-                    <span className="font-medium text-green-600">INB-002</span>
-                    <p className="text-sm text-gray-600">Spicy Nimko Mix - 300 packets</p>
-                  </div>
-                  <span className="text-sm text-gray-500">14:20</span>
-                </div>
+                <p className="text-sm font-bold text-black">Today's Entries</p>
+                <p className="text-3xl font-bold text-red-600">{stats.todayEntries}</p>
               </div>
             </div>
           </div>
 
-          <div className="mt-8 bg-blue-50 p-6 rounded-lg">
-            <h3 className="text-lg font-semibold text-blue-900 mb-2">📋 Gatekeeper Responsibilities</h3>
-            <ul className="text-blue-800 space-y-1">
-              <li>• Record all truck entries and exits with driver and license plate information</li>
-              <li>• Track inbound goods movements from suppliers</li>
-              <li>• Track outbound goods movements to customers</li>
-              <li>• Verify batch numbers and expiry dates for food safety</li>
-              <li>• Monitor warehouse capacity and status</li>
-            </ul>
+          <div className="bg-white border-2 border-black rounded-lg shadow-lg p-6">
+            <div className="flex items-center justify-center">
+              <div className="text-center">
+                <div className="w-16 h-16 bg-red-100 border-2 border-red-500 rounded-full flex items-center justify-center mx-auto mb-3">
+                  <svg className="h-8 w-8 text-red-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+                  </svg>
+                </div>
+                <p className="text-sm font-bold text-black">Today's Exits</p>
+                <p className="text-3xl font-bold text-red-600">{stats.todayExits}</p>
+              </div>
+            </div>
+          </div>
+
+          <div className="bg-white border-2 border-black rounded-lg shadow-lg p-6">
+            <div className="flex items-center justify-center">
+              <div className="text-center">
+                <div className="w-16 h-16 bg-gray-100 border-2 border-gray-500 rounded-full flex items-center justify-center mx-auto mb-3">
+                  <svg className="h-8 w-8 text-gray-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
+                  </svg>
+                </div>
+                <p className="text-sm font-bold text-black">Pending Movements</p>
+                <p className="text-3xl font-bold text-red-600">{stats.pendingMovements}</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Module Cards */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          {/* Warehouse Gate Module */}
+          <div className="bg-white border-2 border-black rounded-lg shadow-lg p-6">
+            <div className="text-center mb-6">
+              <div className="w-20 h-20 bg-green-100 border-2 border-green-500 rounded-full flex items-center justify-center mx-auto mb-4">
+                <svg className="h-10 w-10 text-green-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4" />
+                </svg>
+              </div>
+              <h3 className="text-xl font-bold text-black mb-2">Warehouse Gate</h3>
+              <p className="text-gray-600 text-sm mb-4">Vehicle Entry & Exit</p>
+              <p className="text-gray-700 text-sm mb-6">
+                Log vehicle entries and exits with driver details, purpose, and timestamps.
+              </p>
+            </div>
+            <div className="space-y-3">
+              <Link 
+                href="/gatekeeper/gate" 
+                className="block w-full bg-green-600 text-white text-center py-3 px-4 rounded-lg hover:bg-green-700 transition-colors font-bold border-2 border-green-700"
+              >
+                Manage Gate
+              </Link>
+              <Link 
+                href="/gatekeeper/gate/logs" 
+                className="block w-full bg-white text-green-600 text-center py-3 px-4 rounded-lg hover:bg-green-50 transition-colors font-bold border-2 border-green-600"
+              >
+                View Logs
+              </Link>
+            </div>
+          </div>
+
+          {/* Stock Movements Module */}
+          <div className="bg-white border-2 border-black rounded-lg shadow-lg p-6">
+            <div className="text-center mb-6">
+              <div className="w-20 h-20 bg-red-100 border-2 border-red-500 rounded-full flex items-center justify-center mx-auto mb-4">
+                <svg className="h-10 w-10 text-red-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
+                </svg>
+              </div>
+              <h3 className="text-xl font-bold text-black mb-2">Stock Movements</h3>
+              <p className="text-gray-600 text-sm mb-4">Inventory Tracking</p>
+              <p className="text-gray-700 text-sm mb-6">
+                Record stock movements linked to truck entries for inventory tracking.
+              </p>
+            </div>
+            <div className="space-y-3">
+              <Link 
+                href="/gatekeeper/movements" 
+                className="block w-full bg-red-600 text-white text-center py-3 px-4 rounded-lg hover:bg-red-700 transition-colors font-bold border-2 border-red-700"
+              >
+                Manage Movements
+              </Link>
+              <Link 
+                href="/gatekeeper/movements/history" 
+                className="block w-full bg-white text-red-600 text-center py-3 px-4 rounded-lg hover:bg-red-50 transition-colors font-bold border-2 border-red-600"
+              >
+                View History
+              </Link>
+            </div>
+          </div>
+
+          {/* Truck Management Module */}
+          <div className="bg-white border-2 border-black rounded-lg shadow-lg p-6">
+            <div className="text-center mb-6">
+              <div className="w-20 h-20 bg-gray-100 border-2 border-gray-500 rounded-full flex items-center justify-center mx-auto mb-4">
+                <svg className="h-10 w-10 text-gray-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4" />
+                </svg>
+              </div>
+              <h3 className="text-xl font-bold text-black mb-2">Truck Management</h3>
+              <p className="text-gray-600 text-sm mb-4">Vehicle Tracking</p>
+              <p className="text-gray-700 text-sm mb-6">
+                Track truck status, manage entries, and monitor vehicle movements.
+              </p>
+            </div>
+            <div className="space-y-3">
+              <Link 
+                href="/gatekeeper/trucks" 
+                className="block w-full bg-black text-white text-center py-3 px-4 rounded-lg hover:bg-gray-800 transition-colors font-bold border-2 border-gray-700"
+              >
+                Manage Trucks
+              </Link>
+              <Link 
+                href="/gatekeeper/trucks/status" 
+                className="block w-full bg-white text-black text-center py-3 px-4 rounded-lg hover:bg-gray-50 transition-colors font-bold border-2 border-gray-600"
+              >
+                View Status
+              </Link>
+            </div>
+          </div>
+        </div>
+
+        {/* Quick Actions */}
+        <div className="bg-white border-2 border-black rounded-lg shadow-lg p-6">
+          <h3 className="text-xl font-bold text-black mb-6 text-center">Quick Actions</h3>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+            <Link 
+              href="/gatekeeper/gate/entry" 
+              className="flex items-center justify-center p-4 bg-green-100 border-2 border-green-600 rounded-lg hover:bg-green-200 transition-colors"
+            >
+              <svg className="h-6 w-6 text-green-600 mr-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+              </svg>
+              <span className="text-green-700 font-bold">Log Entry</span>
+            </Link>
+            
+            <Link 
+              href="/gatekeeper/gate/exit" 
+              className="flex items-center justify-center p-4 bg-red-100 border-2 border-red-600 rounded-lg hover:bg-red-200 transition-colors"
+            >
+              <svg className="h-6 w-6 text-red-600 mr-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+              </svg>
+              <span className="text-red-700 font-bold">Log Exit</span>
+            </Link>
+            
+            <Link 
+              href="/gatekeeper/movements/new" 
+              className="flex items-center justify-center p-4 bg-gray-100 border-2 border-gray-600 rounded-lg hover:bg-gray-200 transition-colors"
+            >
+              <svg className="h-6 w-6 text-gray-600 mr-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
+              </svg>
+              <span className="text-gray-700 font-bold">Record Movement</span>
+            </Link>
+            
+            <Link 
+              href="/gatekeeper/trucks/inside" 
+              className="flex items-center justify-center p-4 bg-black text-white border-2 border-gray-800 rounded-lg hover:bg-gray-800 transition-colors"
+            >
+              <svg className="h-6 w-6 text-white mr-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
+              </svg>
+              <span className="text-white font-bold">View Inside</span>
+            </Link>
           </div>
         </div>
       </div>
-    </GatekeeperOnly>
-  );
+    </div>
+  )
 }

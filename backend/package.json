@@ -19,6 +19,10 @@
     "test:auth": "jest src/tests/auth.test.js --verbose",
     "test:protected": "jest src/tests/protected.test.js --verbose",
     "test:products": "jest src/tests/products.test.js --verbose",
+    "test:stock-movements": "jest src/tests/stock-movements.test.js --verbose",
+    "test:accounting": "jest src/tests/accounting.test.js --verbose",
+    "test:director-dashboard": "jest src/tests/director-dashboard.test.js --verbose",
+    "test:audit-logging": "jest src/tests/audit-logging.test.js --verbose",
     "test:watch": "jest --testPathPattern=tests --watch --verbose"
   },
   "dependencies": {
@@ -32,7 +36,9 @@
     "dotenv": "^16.3.1",
     "express-rate-limit": "^7.1.5",
     "express-validator": "^7.0.1",
-    "morgan": "^1.10.0"
+    "morgan": "^1.10.0",
+    "puppeteer": "^21.5.2",
+    "handlebars": "^4.7.8"
   },
   "devDependencies": {
     "nodemon": "^3.0.2",

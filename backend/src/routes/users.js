@@ -1,7 +1,7 @@
 const express = require('express');
 const { body, validationResult } = require('express-validator');
 const { query, queryAll, runQuery } = require('../config/database');
-const { requireAdmin, requireManager } = require('../middleware/auth');
+const { requireAdmin } = require('../middleware/auth');
 
 const router = express.Router();
 
@@ -184,7 +184,7 @@ router.delete('/:id', requireAdmin, async (req, res) => {
 });
 
 // Get users by role (Admin/Manager)
-router.get('/role/:role', requireManager, async (req, res) => {
+router.get('/role/:role', requireAdmin, async (req, res) => {
   try {
     const { role } = req.params;
 

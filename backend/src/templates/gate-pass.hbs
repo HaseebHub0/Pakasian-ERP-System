@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gate Pass - {{gate_pass_number}}</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .gate-pass {
+            background-color: white;
+            border: 2px solid #333;
+            border-radius: 8px;
+            padding: 30px;
+            max-width: 800px;
+            margin: 0 auto;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+        .header {
+            text-align: center;
+            border-bottom: 3px solid #2c5aa0;
+            padding-bottom: 20px;
+            margin-bottom: 30px;
+        }
+        .company-name {
+            font-size: 28px;
+            font-weight: bold;
+            color: #2c5aa0;
+            margin-bottom: 5px;
+        }
+        .company-details {
+            font-size: 14px;
+            color: #666;
+            margin-bottom: 10px;
+        }
+        .gate-pass-title {
+            font-size: 24px;
+            font-weight: bold;
+            color: #333;
+            margin-top: 15px;
+        }
+        .gate-pass-number {
+            font-size: 18px;
+            color: #2c5aa0;
+            font-weight: bold;
+        }
+        .content {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            margin-bottom: 30px;
+        }
+        .section {
+            background-color: #f8f9fa;
+            padding: 20px;
+            border-radius: 5px;
+            border-left: 4px solid #2c5aa0;
+        }
+        .section-title {
+            font-size: 16px;
+            font-weight: bold;
+            color: #2c5aa0;
+            margin-bottom: 15px;
+            text-transform: uppercase;
+        }
+        .field {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 8px;
+            padding: 5px 0;
+            border-bottom: 1px dotted #ccc;
+        }
+        .field:last-child {
+            border-bottom: none;
+        }
+        .field-label {
+            font-weight: bold;
+            color: #555;
+        }
+        .field-value {
+            color: #333;
+            text-align: right;
+        }
+        .movement-type {
+            text-align: center;
+            margin: 20px 0;
+        }
+        .movement-type-badge {
+            display: inline-block;
+            padding: 10px 30px;
+            border-radius: 25px;
+            font-size: 18px;
+            font-weight: bold;
+            text-transform: uppercase;
+        }
+        .movement-type.in {
+            background-color: #d4edda;
+            color: #155724;
+            border: 2px solid #28a745;
+        }
+        .movement-type.out {
+            background-color: #f8d7da;
+            color: #721c24;
+            border: 2px solid #dc3545;
+        }
+        .footer {
+            margin-top: 30px;
+            padding-top: 20px;
+            border-top: 2px solid #ddd;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+        }
+        .signature-section {
+            text-align: center;
+        }
+        .signature-line {
+            border-bottom: 1px solid #333;
+            margin-bottom: 5px;
+            height: 40px;
+        }
+        .signature-label {
+            font-size: 12px;
+            color: #666;
+        }
+        .generated-info {
+            text-align: right;
+            font-size: 12px;
+            color: #666;
+            margin-top: 20px;
+        }
+        .barcode-area {
+            text-align: center;
+            margin: 20px 0;
+            padding: 15px;
+            background-color: #f8f9fa;
+            border: 1px dashed #ccc;
+        }
+        .barcode-text {
+            font-family: 'Courier New', monospace;
+            font-size: 16px;
+            letter-spacing: 2px;
+        }
+        @media print {
+            body {
+                background-color: white;
+            }
+            .gate-pass {
+                box-shadow: none;
+                border: 2px solid #333;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="gate-pass">
+        <!-- Header -->
+        <div class="header">
+            <div class="company-name">{{companyName}}</div>
+            <div class="company-details">
+                {{companyAddress}}<br>
+                Phone: {{companyPhone}} | Email: {{companyEmail}}
+            </div>
+            <div class="gate-pass-title">GATE PASS</div>
+            <div class="gate-pass-number">{{gate_pass_number}}</div>
+        </div>
+
+        <!-- Movement Type Badge -->
+        <div class="movement-type">
+            <span class="movement-type-badge {{movement_type}}">
+                {{#if (eq movement_type 'in')}}
+                    INBOUND STOCK
+                {{else}}
+                    OUTBOUND STOCK
+                {{/if}}
+            </span>
+        </div>
+
+        <!-- Main Content -->
+        <div class="content">
+            <!-- Product Information -->
+            <div class="section">
+                <div class="section-title">Product Information</div>
+                <div class="field">
+                    <span class="field-label">Product Name:</span>
+                    <span class="field-value">{{product_name}}</span>
+                </div>
+                <div class="field">
+                    <span class="field-label">SKU:</span>
+                    <span class="field-value">{{product_sku}}</span>
+                </div>
+                <div class="field">
+                    <span class="field-label">Batch Number:</span>
+                    <span class="field-value">{{batch_number}}</span>
+                </div>
+                <div class="field">
+                    <span class="field-label">Quantity:</span>
+                    <span class="field-value">{{quantity}} units</span>
+                </div>
+                {{#if expiry_date}}
+                <div class="field">
+                    <span class="field-label">Expiry Date:</span>
+                    <span class="field-value">{{expiry_date}}</span>
+                </div>
+                {{/if}}
+            </div>
+
+            <!-- Vehicle & Driver Information -->
+            <div class="section">
+                <div class="section-title">Vehicle & Driver Details</div>
+                <div class="field">
+                    <span class="field-label">Vehicle Number:</span>
+                    <span class="field-value">{{vehicle_number}}</span>
+                </div>
+                <div class="field">
+                    <span class="field-label">Driver Name:</span>
+                    <span class="field-value">{{driver_name}}</span>
+                </div>
+                <div class="field">
+                    <span class="field-label">Warehouse:</span>
+                    <span class="field-value">{{warehouse_name}}</span>
+                </div>
+                <div class="field">
+                    <span class="field-label">Location:</span>
+                    <span class="field-value">{{warehouse_location}}</span>
+                </div>
+                {{#if source}}
+                <div class="field">
+                    <span class="field-label">Source:</span>
+                    <span class="field-value">{{source}}</span>
+                </div>
+                {{/if}}
+                {{#if destination}}
+                <div class="field">
+                    <span class="field-label">Destination:</span>
+                    <span class="field-value">{{destination}}</span>
+                </div>
+                {{/if}}
+            </div>
+        </div>
+
+        <!-- Barcode Area -->
+        <div class="barcode-area">
+            <div class="barcode-text">*{{gate_pass_number}}*</div>
+            <div style="font-size: 12px; color: #666; margin-top: 5px;">Gate Pass Number</div>
+        </div>
+
+        <!-- Footer with Signatures -->
+        <div class="footer">
+            <div class="signature-section">
+                <div class="signature-line"></div>
+                <div class="signature-label">Gatekeeper Signature</div>
+                <div style="margin-top: 10px; font-size: 14px;">{{gatekeeper_name}}</div>
+            </div>
+            <div class="signature-section">
+                <div class="signature-line"></div>
+                <div class="signature-label">Driver Signature</div>
+                <div style="margin-top: 10px; font-size: 14px;">{{driver_name}}</div>
+            </div>
+        </div>
+
+        <!-- Generated Info -->
+        <div class="generated-info">
+            Generated on: {{generatedAt}}<br>
+            Movement ID: {{id}}<br>
+            {{#if entry_time}}
+            Entry Time: {{entry_time}}<br>
+            {{/if}}
+            {{#if exit_time}}
+            Exit Time: {{exit_time}}<br>
+            {{/if}}
+        </div>
+    </div>
+</body>
+</html>

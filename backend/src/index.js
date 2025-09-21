@@ -8,6 +8,12 @@ require('dotenv').config();
 const authRoutes = require('./routes/auth');
 const userRoutes = require('./routes/users');
 const protectedRoutes = require('./routes/protected');
+const stockMovementRoutes = require('./routes/stock-movements');
+const salesRoutes = require('./routes/sales');
+const dashboardRoutes = require('./routes/dashboard');
+const trucksRoutes = require('./routes/trucks');
+const adminRoutes = require('./routes/admin');
+const accountingRoutes = require('./routes/accounting');
 const { authenticateToken } = require('./middleware/auth');
 const { initializeDatabase } = require('./config/database');
 
@@ -49,6 +55,12 @@ app.get('/health', (req, res) => {
 app.use('/api/auth', authRoutes);
 app.use('/api/users', authenticateToken, userRoutes);
 app.use('/api/protected', protectedRoutes);
+app.use('/api/stock-movements', stockMovementRoutes);
+app.use('/api/sales', salesRoutes);
+app.use('/api/dashboard', dashboardRoutes);
+app.use('/api/trucks', trucksRoutes);
+app.use('/api/admin', adminRoutes);
+app.use('/api/accounting', accountingRoutes);
 
 // Protected route example
 app.get('/api/protected', authenticateToken, (req, res) => {
