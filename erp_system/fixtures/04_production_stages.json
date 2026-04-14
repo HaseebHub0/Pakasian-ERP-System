@@ -1,0 +1,68 @@
+[
+    {
+        "model": "manufacturing.productionstage",
+        "pk": 1,
+        "fields": {
+            "name": "Mixing",
+            "sequence": 1,
+            "description": "Raw ingredients are combined and blended in the mixing machine",
+            "estimated_duration_minutes": 30,
+            "is_active": true
+        }
+    },
+    {
+        "model": "manufacturing.productionstage",
+        "pk": 2,
+        "fields": {
+            "name": "Frying",
+            "sequence": 2,
+            "description": "Mixed product is deep-fried in oil at controlled temperature",
+            "estimated_duration_minutes": 20,
+            "is_active": true
+        }
+    },
+    {
+        "model": "manufacturing.productionstage",
+        "pk": 3,
+        "fields": {
+            "name": "Oil Draining",
+            "sequence": 3,
+            "description": "Excess oil is drained from the fried product on drainage racks",
+            "estimated_duration_minutes": 15,
+            "is_active": true
+        }
+    },
+    {
+        "model": "manufacturing.productionstage",
+        "pk": 4,
+        "fields": {
+            "name": "Seasoning",
+            "sequence": 4,
+            "description": "Flavour seasoning is applied to the product in the seasoning drum",
+            "estimated_duration_minutes": 10,
+            "is_active": true
+        }
+    },
+    {
+        "model": "manufacturing.productionstage",
+        "pk": 5,
+        "fields": {
+            "name": "Cooling",
+            "sequence": 5,
+            "description": "Product is cooled on conveyor belts to ambient temperature before packing",
+            "estimated_duration_minutes": 20,
+            "is_active": true
+        }
+    },
+    {
+        "model": "manufacturing.productionstage",
+        "pk": 6,
+        "fields": {
+            "name": "Packing",
+            "sequence": 6,
+            "description": "Cooled product is weighed, packed into bags, and sealed",
+            "estimated_duration_minutes": 25,
+            "is_active": true
+        }
+    }
+]

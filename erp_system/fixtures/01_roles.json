@@ -1,0 +1,68 @@
+[
+    {
+        "model": "authentication.role",
+        "pk": "d1c254b0-52e4-477c-a4ec-b248a39ca25e",
+        "fields": {
+            "role_name": "admin",
+            "permissions": "",
+            "description": "System Administrator — full access to all modules",
+            "created_at": "2026-03-15T00:00:00Z",
+            "updated_at": "2026-03-15T00:00:00Z"
+        }
+    },
+    {
+        "model": "authentication.role",
+        "pk": "83794e50-4df2-45e0-9428-cb4b2bf6db2a",
+        "fields": {
+            "role_name": "production_manager",
+            "permissions": "",
+            "description": "Manages manufacturing, MRP, and inventory operations",
+            "created_at": "2026-03-15T00:00:00Z",
+            "updated_at": "2026-03-15T00:00:00Z"
+        }
+    },
+    {
+        "model": "authentication.role",
+        "pk": "2a4fe5a7-f9d9-4836-8a56-4b68eef4b8fc",
+        "fields": {
+            "role_name": "warehouse_manager",
+            "permissions": "",
+            "description": "Manages warehouse operations, stock movements, and routes",
+            "created_at": "2026-03-15T00:00:00Z",
+            "updated_at": "2026-03-15T00:00:00Z"
+        }
+    },
+    {
+        "model": "authentication.role",
+        "pk": "e0eaea93-51bf-4b47-bbe5-5fef607d7f78",
+        "fields": {
+            "role_name": "procurement_manager",
+            "permissions": "",
+            "description": "Manages procurement, purchase requests, and inventory",
+            "created_at": "2026-03-15T00:00:00Z",
+            "updated_at": "2026-03-15T00:00:00Z"
+        }
+    },
+    {
+        "model": "authentication.role",
+        "pk": "18f9be3d-3b95-4eb8-b2ef-34db22bafe3d",
+        "fields": {
+            "role_name": "finance_manager",
+            "permissions": "",
+            "description": "Manages finance, costing, and high-value procurement approvals",
+            "created_at": "2026-03-15T00:00:00Z",
+            "updated_at": "2026-03-15T00:00:00Z"
+        }
+    },
+    {
+        "model": "authentication.role",
+        "pk": "ba71c84f-e25f-4d92-bf3e-1ed1e1f76228",
+        "fields": {
+            "role_name": "sales_manager",
+            "permissions": "",
+            "description": "Manages sales, orders, incentives, and route planning",
+            "created_at": "2026-03-15T00:00:00Z",
+            "updated_at": "2026-03-15T00:00:00Z"
+        }
+    }
+]

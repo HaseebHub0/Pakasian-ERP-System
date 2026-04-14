@@ -1,0 +1,150 @@
+[
+    {
+        "model": "django_celery_beat.crontabschedule",
+        "pk": 1,
+        "fields": {
+            "minute": "0",
+            "hour": "6",
+            "day_of_week": "*",
+            "day_of_month": "*",
+            "month_of_year": "*",
+            "timezone": "UTC"
+        }
+    },
+    {
+        "model": "django_celery_beat.crontabschedule",
+        "pk": 2,
+        "fields": {
+            "minute": "0",
+            "hour": "23",
+            "day_of_week": "0",
+            "day_of_month": "*",
+            "month_of_year": "*",
+            "timezone": "UTC"
+        }
+    },
+    {
+        "model": "django_celery_beat.crontabschedule",
+        "pk": 3,
+        "fields": {
+            "minute": "0",
+            "hour": "7",
+            "day_of_week": "*",
+            "day_of_month": "*",
+            "month_of_year": "*",
+            "timezone": "UTC"
+        }
+    },
+    {
+        "model": "django_celery_beat.intervalschedule",
+        "pk": 1,
+        "fields": {
+            "every": 60,
+            "period": "seconds"
+        }
+    },
+    {
+        "model": "django_celery_beat.periodictask",
+        "pk": 1,
+        "fields": {
+            "name": "Check expiring batches at 6 AM",
+            "task": "apps.core.tasks.check_expiring_batches",
+            "crontab": 1,
+            "interval": null,
+            "args": "[]",
+            "kwargs": "{}",
+            "queue": null,
+            "exchange": null,
+            "routing_key": null,
+            "headers": "{}",
+            "priority": null,
+            "expires": null,
+            "expire_seconds": null,
+            "one_off": false,
+            "start_time": null,
+            "enabled": true,
+            "last_run_at": null,
+            "total_run_count": 0,
+            "date_changed": "2026-01-01T00:00:00Z",
+            "description": "Daily at 06:00 UTC — marks batches as Expired and flags near-expiry batches."
+        }
+    },
+    {
+        "model": "django_celery_beat.periodictask",
+        "pk": 2,
+        "fields": {
+            "name": "Run MRP engine on Sunday 11 PM",
+            "task": "apps.core.tasks.run_mrp_engine",
+            "crontab": 2,
+            "interval": null,
+            "args": "[]",
+            "kwargs": "{}",
+            "queue": null,
+            "exchange": null,
+            "routing_key": null,
+            "headers": "{}",
+            "priority": null,
+            "expires": null,
+            "expire_seconds": null,
+            "one_off": false,
+            "start_time": null,
+            "enabled": true,
+            "last_run_at": null,
+            "total_run_count": 0,
+            "date_changed": "2026-01-01T00:00:00Z",
+            "description": "Every Sunday at 23:00 UTC — runs the full MRP engine to compute production requirements."
+        }
+    },
+    {
+        "model": "django_celery_beat.periodictask",
+        "pk": 3,
+        "fields": {
+            "name": "Check reorder rules at 7 AM",
+            "task": "apps.core.tasks.check_reorder_rules",
+            "crontab": 3,
+            "interval": null,
+            "args": "[]",
+            "kwargs": "{}",
+            "queue": null,
+            "exchange": null,
+            "routing_key": null,
+            "headers": "{}",
+            "priority": null,
+            "expires": null,
+            "expire_seconds": null,
+            "one_off": false,
+            "start_time": null,
+            "enabled": true,
+            "last_run_at": null,
+            "total_run_count": 0,
+            "date_changed": "2026-01-01T00:00:00Z",
+            "description": "Daily at 07:00 UTC — auto-creates Purchase Requests for materials below minimum stock."
+        }
+    },
+    {
+        "model": "django_celery_beat.periodictask",
+        "pk": 4,
+        "fields": {
+            "name": "Process background jobs every 60s",
+            "task": "apps.core.tasks.process_background_jobs",
+            "crontab": null,
+            "interval": 1,
+            "args": "[]",
+            "kwargs": "{}",
+            "queue": null,
+            "exchange": null,
+            "routing_key": null,
+            "headers": "{}",
+            "priority": null,
+            "expires": null,
+            "expire_seconds": null,
+            "one_off": false,
+            "start_time": null,
+            "enabled": true,
+            "last_run_at": null,
+            "total_run_count": 0,
+            "date_changed": "2026-01-01T00:00:00Z",
+            "description": "Every 60 seconds — polls the background_jobs table and dispatches up to 10 pending jobs."
+        }
+    }
+]

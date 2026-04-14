@@ -1,0 +1,1678 @@
+[
+    {
+        "model": "authentication.permission",
+        "pk": "588c69b5-25ca-4257-9c0f-f990f2fb3ccb",
+        "fields": {
+            "module": "master_data",
+            "action": "view",
+            "description": "View Master Data",
+            "created_at": "2026-03-15T00:00:00Z",
+            "updated_at": "2026-03-15T00:00:00Z"
+        }
+    },
+    {
+        "model": "authentication.permission",
+        "pk": "14c06fd2-b465-4067-9a42-8d22dc16fce8",
+        "fields": {
+            "module": "master_data",
+            "action": "create",
+            "description": "Create Master Data",
+            "created_at": "2026-03-15T00:00:00Z",
+            "updated_at": "2026-03-15T00:00:00Z"
+        }
+    },
+    {
+        "model": "authentication.permission",
+        "pk": "b8e3c6f8-49ac-450b-8046-699404da8134",
+        "fields": {
+            "module": "master_data",
+            "action": "update",
+            "description": "Update Master Data",
+            "created_at": "2026-03-15T00:00:00Z",
+            "updated_at": "2026-03-15T00:00:00Z"
+        }
+    },
+    {
+        "model": "authentication.permission",
+        "pk": "7ec4b79b-c62c-4860-a296-18c3bb786198",
+        "fields": {
+            "module": "master_data",
+            "action": "delete",
+            "description": "Delete Master Data",
+            "created_at": "2026-03-15T00:00:00Z",
+            "updated_at": "2026-03-15T00:00:00Z"
+        }
+    },
+    {
+        "model": "authentication.permission",
+        "pk": "4078064d-84cb-4ed7-b2c7-11be2ea01b5c",
+        "fields": {
+            "module": "master_data",
+            "action": "approve",
+            "description": "Approve Master Data",
+            "created_at": "2026-03-15T00:00:00Z",
+            "updated_at": "2026-03-15T00:00:00Z"
+        }
+    },
+    {
+        "model": "authentication.permission",
+        "pk": "3cee2ac7-c9f7-4fc3-90cd-b3e57c2b10dd",
+        "fields": {
+            "module": "procurement",
+            "action": "view",
+            "description": "View Procurement",
+            "created_at": "2026-03-15T00:00:00Z",
+            "updated_at": "2026-03-15T00:00:00Z"
+        }
+    },
+    {
+        "model": "authentication.permission",
+        "pk": "afa691c2-783a-4561-a9f6-c522ad6ddab0",
+        "fields": {
+            "module": "procurement",
+            "action": "create",
+            "description": "Create Procurement",
+            "created_at": "2026-03-15T00:00:00Z",
+            "updated_at": "2026-03-15T00:00:00Z"
+        }
+    },
+    {
+        "model": "authentication.permission",
+        "pk": "0822aba2-9300-469d-8524-3f15e46f09d3",
+        "fields": {
+            "module": "procurement",
+            "action": "update",
+            "description": "Update Procurement",
+            "created_at": "2026-03-15T00:00:00Z",
+            "updated_at": "2026-03-15T00:00:00Z"
+        }
+    },
+    {
+        "model": "authentication.permission",
+        "pk": "50941aa6-5b08-40d1-9b34-aead94e8031e",
+        "fields": {
+            "module": "procurement",
+            "action": "delete",
+            "description": "Delete Procurement",
+            "created_at": "2026-03-15T00:00:00Z",
+            "updated_at": "2026-03-15T00:00:00Z"
+        }
+    },
+    {
+        "model": "authentication.permission",
+        "pk": "abdee3c2-0668-44bd-9365-a225539f8b2b",
+        "fields": {
+            "module": "procurement",
+            "action": "approve",
+            "description": "Approve Procurement",
+            "created_at": "2026-03-15T00:00:00Z",
+            "updated_at": "2026-03-15T00:00:00Z"
+        }
+    },
+    {
+        "model": "authentication.permission",
+        "pk": "707f67fc-140f-45a0-8672-ad9b83075481",
+        "fields": {
+            "module": "inventory",
+            "action": "view",
+            "description": "View Inventory",
+            "created_at": "2026-03-15T00:00:00Z",
+            "updated_at": "2026-03-15T00:00:00Z"
+        }
+    },
+    {
+        "model": "authentication.permission",
+        "pk": "a48ba58e-50c9-4d91-9619-77fd64b9da36",
+        "fields": {
+            "module": "inventory",
+            "action": "create",
+            "description": "Create Inventory",
+            "created_at": "2026-03-15T00:00:00Z",
+            "updated_at": "2026-03-15T00:00:00Z"
+        }
+    },
+    {
+        "model": "authentication.permission",
+        "pk": "1dfac6f0-9022-435d-945f-20094f45465a",
+        "fields": {
+            "module": "inventory",
+            "action": "update",
+            "description": "Update Inventory",
+            "created_at": "2026-03-15T00:00:00Z",
+            "updated_at": "2026-03-15T00:00:00Z"
+        }
+    },
+    {
+        "model": "authentication.permission",
+        "pk": "cc378fe9-4878-4ed3-a8ef-86d58253b727",
+        "fields": {
+            "module": "inventory",
+            "action": "delete",
+            "description": "Delete Inventory",
+            "created_at": "2026-03-15T00:00:00Z",
+            "updated_at": "2026-03-15T00:00:00Z"
+        }
+    },
+    {
+        "model": "authentication.permission",
+        "pk": "923d9dd7-cb14-401a-bf74-11483afea7fc",
+        "fields": {
+            "module": "inventory",
+            "action": "approve",
+            "description": "Approve Inventory",
+            "created_at": "2026-03-15T00:00:00Z",
+            "updated_at": "2026-03-15T00:00:00Z"
+        }
+    },
+    {
+        "model": "authentication.permission",
+        "pk": "7ad82241-a09e-4984-aeb1-bce36583cee2",
+        "fields": {
+            "module": "manufacturing",
+            "action": "view",
+            "description": "View Manufacturing",
+            "created_at": "2026-03-15T00:00:00Z",
+            "updated_at": "2026-03-15T00:00:00Z"
+        }
+    },
+    {
+        "model": "authentication.permission",
+        "pk": "911b9559-de8d-4118-84e2-38b6a677c241",
+        "fields": {
+            "module": "manufacturing",
+            "action": "create",
+            "description": "Create Manufacturing",
+            "created_at": "2026-03-15T00:00:00Z",
+            "updated_at": "2026-03-15T00:00:00Z"
+        }
+    },
+    {
+        "model": "authentication.permission",
+        "pk": "ee08f78d-e7f6-4536-b3ac-57b461d703be",
+        "fields": {
+            "module": "manufacturing",
+            "action": "update",
+            "description": "Update Manufacturing",
+            "created_at": "2026-03-15T00:00:00Z",
+            "updated_at": "2026-03-15T00:00:00Z"
+        }
+    },
+    {
+        "model": "authentication.permission",
+        "pk": "a20c5b15-f727-4926-8e61-6d18fc188193",
+        "fields": {
+            "module": "manufacturing",
+            "action": "delete",
+            "description": "Delete Manufacturing",
+            "created_at": "2026-03-15T00:00:00Z",
+            "updated_at": "2026-03-15T00:00:00Z"
+        }
+    },
+    {
+        "model": "authentication.permission",
+        "pk": "a8d71d16-0f39-4902-8e68-452dd980f5d6",
+        "fields": {
+            "module": "manufacturing",
+            "action": "approve",
+            "description": "Approve Manufacturing",
+            "created_at": "2026-03-15T00:00:00Z",
+            "updated_at": "2026-03-15T00:00:00Z"
+        }
+    },
+    {
+        "model": "authentication.permission",
+        "pk": "41a7b8bb-a948-4a65-8649-980d52200cce",
+        "fields": {
+            "module": "costing",
+            "action": "view",
+            "description": "View Costing",
+            "created_at": "2026-03-15T00:00:00Z",
+            "updated_at": "2026-03-15T00:00:00Z"
+        }
+    },
+    {
+        "model": "authentication.permission",
+        "pk": "48e5e2ce-142d-41f1-85f1-d1c6086e1943",
+        "fields": {
+            "module": "costing",
+            "action": "create",
+            "description": "Create Costing",
+            "created_at": "2026-03-15T00:00:00Z",
+            "updated_at": "2026-03-15T00:00:00Z"
+        }
+    },
+    {
+        "model": "authentication.permission",
+        "pk": "04610852-7d34-415c-9180-f0c2f9802dbd",
+        "fields": {
+            "module": "costing",
+            "action": "update",
+            "description": "Update Costing",
+            "created_at": "2026-03-15T00:00:00Z",
+            "updated_at": "2026-03-15T00:00:00Z"
+        }
+    },
+    {
+        "model": "authentication.permission",
+        "pk": "efe658b7-42f3-44a6-bd17-436f9eed5480",
+        "fields": {
+            "module": "costing",
+            "action": "delete",
+            "description": "Delete Costing",
+            "created_at": "2026-03-15T00:00:00Z",
+            "updated_at": "2026-03-15T00:00:00Z"
+        }
+    },
+    {
+        "model": "authentication.permission",
+        "pk": "1ab03d2f-ed71-467d-9553-2ecb6655e494",
+        "fields": {
+            "module": "costing",
+            "action": "approve",
+            "description": "Approve Costing",
+            "created_at": "2026-03-15T00:00:00Z",
+            "updated_at": "2026-03-15T00:00:00Z"
+        }
+    },
+    {
+        "model": "authentication.permission",
+        "pk": "7b8dfc56-abff-4b39-ab2f-596d76b81291",
+        "fields": {
+            "module": "sales",
+            "action": "view",
+            "description": "View Sales",
+            "created_at": "2026-03-15T00:00:00Z",
+            "updated_at": "2026-03-15T00:00:00Z"
+        }
+    },
+    {
+        "model": "authentication.permission",
+        "pk": "de9ad453-080f-4922-92bc-37e624b9ab71",
+        "fields": {
+            "module": "sales",
+            "action": "create",
+            "description": "Create Sales",
+            "created_at": "2026-03-15T00:00:00Z",
+            "updated_at": "2026-03-15T00:00:00Z"
+        }
+    },
+    {
+        "model": "authentication.permission",
+        "pk": "054bdf0f-5533-427b-8f13-3dc8d8fc76f7",
+        "fields": {
+            "module": "sales",
+            "action": "update",
+            "description": "Update Sales",
+            "created_at": "2026-03-15T00:00:00Z",
+            "updated_at": "2026-03-15T00:00:00Z"
+        }
+    },
+    {
+        "model": "authentication.permission",
+        "pk": "2af08669-5e00-48f4-8201-f0771305831c",
+        "fields": {
+            "module": "sales",
+            "action": "delete",
+            "description": "Delete Sales",
+            "created_at": "2026-03-15T00:00:00Z",
+            "updated_at": "2026-03-15T00:00:00Z"
+        }
+    },
+    {
+        "model": "authentication.permission",
+        "pk": "f278093f-efd5-49c2-b8b5-bb37dff94ee4",
+        "fields": {
+            "module": "sales",
+            "action": "approve",
+            "description": "Approve Sales",
+            "created_at": "2026-03-15T00:00:00Z",
+            "updated_at": "2026-03-15T00:00:00Z"
+        }
+    },
+    {
+        "model": "authentication.permission",
+        "pk": "0a3150ab-40ec-40f3-8b5e-ea9cf9a58652",
+        "fields": {
+            "module": "finance",
+            "action": "view",
+            "description": "View Finance",
+            "created_at": "2026-03-15T00:00:00Z",
+            "updated_at": "2026-03-15T00:00:00Z"
+        }
+    },
+    {
+        "model": "authentication.permission",
+        "pk": "c0795633-a3b5-489c-b39c-b09c4d613aab",
+        "fields": {
+            "module": "finance",
+            "action": "create",
+            "description": "Create Finance",
+            "created_at": "2026-03-15T00:00:00Z",
+            "updated_at": "2026-03-15T00:00:00Z"
+        }
+    },
+    {
+        "model": "authentication.permission",
+        "pk": "6c803f4a-f84a-4ffe-a432-ca0083d1e8c9",
+        "fields": {
+            "module": "finance",
+            "action": "update",
+            "description": "Update Finance",
+            "created_at": "2026-03-15T00:00:00Z",
+            "updated_at": "2026-03-15T00:00:00Z"
+        }
+    },
+    {
+        "model": "authentication.permission",
+        "pk": "64e3fa89-4c74-4369-b349-5076ac113090",
+        "fields": {
+            "module": "finance",
+            "action": "delete",
+            "description": "Delete Finance",
+            "created_at": "2026-03-15T00:00:00Z",
+            "updated_at": "2026-03-15T00:00:00Z"
+        }
+    },
+    {
+        "model": "authentication.permission",
+        "pk": "6c1e20e1-6f2f-48e8-875d-80efb27554c8",
+        "fields": {
+            "module": "finance",
+            "action": "approve",
+            "description": "Approve Finance",
+            "created_at": "2026-03-15T00:00:00Z",
+            "updated_at": "2026-03-15T00:00:00Z"
+        }
+    },
+    {
+        "model": "authentication.permission",
+        "pk": "cfd481a8-d878-4d48-aa57-2d25e5efa696",
+        "fields": {
+            "module": "mrp",
+            "action": "view",
+            "description": "View MRP",
+            "created_at": "2026-03-15T00:00:00Z",
+            "updated_at": "2026-03-15T00:00:00Z"
+        }
+    },
+    {
+        "model": "authentication.permission",
+        "pk": "8ef24776-e63f-4a8d-a53a-e81fcd571037",
+        "fields": {
+            "module": "mrp",
+            "action": "create",
+            "description": "Create MRP",
+            "created_at": "2026-03-15T00:00:00Z",
+            "updated_at": "2026-03-15T00:00:00Z"
+        }
+    },
+    {
+        "model": "authentication.permission",
+        "pk": "21da5dbf-1b23-416f-8e68-bcffe4a211b7",
+        "fields": {
+            "module": "mrp",
+            "action": "update",
+            "description": "Update MRP",
+            "created_at": "2026-03-15T00:00:00Z",
+            "updated_at": "2026-03-15T00:00:00Z"
+        }
+    },
+    {
+        "model": "authentication.permission",
+        "pk": "3a49fb85-f69f-490d-a1a0-02793a19c69a",
+        "fields": {
+            "module": "mrp",
+            "action": "delete",
+            "description": "Delete MRP",
+            "created_at": "2026-03-15T00:00:00Z",
+            "updated_at": "2026-03-15T00:00:00Z"
+        }
+    },
+    {
+        "model": "authentication.permission",
+        "pk": "5372a5e7-ef74-4a92-90c1-3948fa6e53f5",
+        "fields": {
+            "module": "mrp",
+            "action": "approve",
+            "description": "Approve MRP",
+            "created_at": "2026-03-15T00:00:00Z",
+            "updated_at": "2026-03-15T00:00:00Z"
+        }
+    },
+    {
+        "model": "authentication.permission",
+        "pk": "cc7f455e-07f2-4586-9036-68548dfa0e36",
+        "fields": {
+            "module": "warehouse",
+            "action": "view",
+            "description": "View Warehouse",
+            "created_at": "2026-03-15T00:00:00Z",
+            "updated_at": "2026-03-15T00:00:00Z"
+        }
+    },
+    {
+        "model": "authentication.permission",
+        "pk": "52f915a2-1c93-47af-a3f1-5886f53609d9",
+        "fields": {
+            "module": "warehouse",
+            "action": "create",
+            "description": "Create Warehouse",
+            "created_at": "2026-03-15T00:00:00Z",
+            "updated_at": "2026-03-15T00:00:00Z"
+        }
+    },
+    {
+        "model": "authentication.permission",
+        "pk": "64fb415c-8257-423b-b51b-281a9940e0e7",
+        "fields": {
+            "module": "warehouse",
+            "action": "update",
+            "description": "Update Warehouse",
+            "created_at": "2026-03-15T00:00:00Z",
+            "updated_at": "2026-03-15T00:00:00Z"
+        }
+    },
+    {
+        "model": "authentication.permission",
+        "pk": "0ccd934e-c00b-43bb-89ae-f99fd24c906d",
+        "fields": {
+            "module": "warehouse",
+            "action": "delete",
+            "description": "Delete Warehouse",
+            "created_at": "2026-03-15T00:00:00Z",
+            "updated_at": "2026-03-15T00:00:00Z"
+        }
+    },
+    {
+        "model": "authentication.permission",
+        "pk": "acff9e5b-f66b-4f24-b123-5bfa95f08806",
+        "fields": {
+            "module": "warehouse",
+            "action": "approve",
+            "description": "Approve Warehouse",
+            "created_at": "2026-03-15T00:00:00Z",
+            "updated_at": "2026-03-15T00:00:00Z"
+        }
+    },
+    {
+        "model": "authentication.permission",
+        "pk": "f151e45e-0b08-4efb-8d7f-a3a6231a357f",
+        "fields": {
+            "module": "routes",
+            "action": "view",
+            "description": "View Routes",
+            "created_at": "2026-03-15T00:00:00Z",
+            "updated_at": "2026-03-15T00:00:00Z"
+        }
+    },
+    {
+        "model": "authentication.permission",
+        "pk": "6ba49168-6c84-48b9-9ed5-8c0aaad9d0c1",
+        "fields": {
+            "module": "routes",
+            "action": "create",
+            "description": "Create Routes",
+            "created_at": "2026-03-15T00:00:00Z",
+            "updated_at": "2026-03-15T00:00:00Z"
+        }
+    },
+    {
+        "model": "authentication.permission",
+        "pk": "ef7db6a7-9a65-428a-97b3-a2f6d99f383b",
+        "fields": {
+            "module": "routes",
+            "action": "update",
+            "description": "Update Routes",
+            "created_at": "2026-03-15T00:00:00Z",
+            "updated_at": "2026-03-15T00:00:00Z"
+        }
+    },
+    {
+        "model": "authentication.permission",
+        "pk": "c11a9198-2272-43ad-b400-ca4bede78a05",
+        "fields": {
+            "module": "routes",
+            "action": "delete",
+            "description": "Delete Routes",
+            "created_at": "2026-03-15T00:00:00Z",
+            "updated_at": "2026-03-15T00:00:00Z"
+        }
+    },
+    {
+        "model": "authentication.permission",
+        "pk": "f71de8c6-d57a-4887-832b-8966ce4fcb7f",
+        "fields": {
+            "module": "routes",
+            "action": "approve",
+            "description": "Approve Routes",
+            "created_at": "2026-03-15T00:00:00Z",
+            "updated_at": "2026-03-15T00:00:00Z"
+        }
+    },
+    {
+        "model": "authentication.permission",
+        "pk": "0cf7a0b6-e00b-4695-a780-7a50d59212f6",
+        "fields": {
+            "module": "incentives",
+            "action": "view",
+            "description": "View Incentives",
+            "created_at": "2026-03-15T00:00:00Z",
+            "updated_at": "2026-03-15T00:00:00Z"
+        }
+    },
+    {
+        "model": "authentication.permission",
+        "pk": "1a5ed9b7-05f8-4f62-8eff-5e1b459d91c7",
+        "fields": {
+            "module": "incentives",
+            "action": "create",
+            "description": "Create Incentives",
+            "created_at": "2026-03-15T00:00:00Z",
+            "updated_at": "2026-03-15T00:00:00Z"
+        }
+    },
+    {
+        "model": "authentication.permission",
+        "pk": "f668d418-26a2-4ba3-a813-01ef12b1f114",
+        "fields": {
+            "module": "incentives",
+            "action": "update",
+            "description": "Update Incentives",
+            "created_at": "2026-03-15T00:00:00Z",
+            "updated_at": "2026-03-15T00:00:00Z"
+        }
+    },
+    {
+        "model": "authentication.permission",
+        "pk": "3da9b8b8-f327-442d-807c-45c672381881",
+        "fields": {
+            "module": "incentives",
+            "action": "delete",
+            "description": "Delete Incentives",
+            "created_at": "2026-03-15T00:00:00Z",
+            "updated_at": "2026-03-15T00:00:00Z"
+        }
+    },
+    {
+        "model": "authentication.permission",
+        "pk": "6ca5fafc-c112-428d-b2de-0e29a1b903ab",
+        "fields": {
+            "module": "incentives",
+            "action": "approve",
+            "description": "Approve Incentives",
+            "created_at": "2026-03-15T00:00:00Z",
+            "updated_at": "2026-03-15T00:00:00Z"
+        }
+    },
+    {
+        "model": "authentication.permission",
+        "pk": "deb694a3-4495-45f7-824b-92c63329f93a",
+        "fields": {
+            "module": "reports",
+            "action": "view",
+            "description": "View Reports",
+            "created_at": "2026-03-15T00:00:00Z",
+            "updated_at": "2026-03-15T00:00:00Z"
+        }
+    },
+    {
+        "model": "authentication.permission",
+        "pk": "06bda848-af04-4cff-a2cc-40bdd6c5a29c",
+        "fields": {
+            "module": "reports",
+            "action": "create",
+            "description": "Create Reports",
+            "created_at": "2026-03-15T00:00:00Z",
+            "updated_at": "2026-03-15T00:00:00Z"
+        }
+    },
+    {
+        "model": "authentication.permission",
+        "pk": "796ced3e-6ff7-4e75-9720-1943903b1285",
+        "fields": {
+            "module": "reports",
+            "action": "update",
+            "description": "Update Reports",
+            "created_at": "2026-03-15T00:00:00Z",
+            "updated_at": "2026-03-15T00:00:00Z"
+        }
+    },
+    {
+        "model": "authentication.permission",
+        "pk": "ff890196-c1eb-4fb6-acbf-89df025f1b4d",
+        "fields": {
+            "module": "reports",
+            "action": "delete",
+            "description": "Delete Reports",
+            "created_at": "2026-03-15T00:00:00Z",
+            "updated_at": "2026-03-15T00:00:00Z"
+        }
+    },
+    {
+        "model": "authentication.permission",
+        "pk": "ebf4bbc2-feb3-4129-ab56-b690cb7cec2f",
+        "fields": {
+            "module": "reports",
+            "action": "approve",
+            "description": "Approve Reports",
+            "created_at": "2026-03-15T00:00:00Z",
+            "updated_at": "2026-03-15T00:00:00Z"
+        }
+    },
+    {
+        "model": "authentication.rolepermission",
+        "pk": 1,
+        "fields": {
+            "role_id": "d1c254b0-52e4-477c-a4ec-b248a39ca25e",
+            "permission_id": "588c69b5-25ca-4257-9c0f-f990f2fb3ccb"
+        }
+    },
+    {
+        "model": "authentication.rolepermission",
+        "pk": 2,
+        "fields": {
+            "role_id": "d1c254b0-52e4-477c-a4ec-b248a39ca25e",
+            "permission_id": "14c06fd2-b465-4067-9a42-8d22dc16fce8"
+        }
+    },
+    {
+        "model": "authentication.rolepermission",
+        "pk": 3,
+        "fields": {
+            "role_id": "d1c254b0-52e4-477c-a4ec-b248a39ca25e",
+            "permission_id": "b8e3c6f8-49ac-450b-8046-699404da8134"
+        }
+    },
+    {
+        "model": "authentication.rolepermission",
+        "pk": 4,
+        "fields": {
+            "role_id": "d1c254b0-52e4-477c-a4ec-b248a39ca25e",
+            "permission_id": "7ec4b79b-c62c-4860-a296-18c3bb786198"
+        }
+    },
+    {
+        "model": "authentication.rolepermission",
+        "pk": 5,
+        "fields": {
+            "role_id": "d1c254b0-52e4-477c-a4ec-b248a39ca25e",
+            "permission_id": "4078064d-84cb-4ed7-b2c7-11be2ea01b5c"
+        }
+    },
+    {
+        "model": "authentication.rolepermission",
+        "pk": 6,
+        "fields": {
+            "role_id": "d1c254b0-52e4-477c-a4ec-b248a39ca25e",
+            "permission_id": "3cee2ac7-c9f7-4fc3-90cd-b3e57c2b10dd"
+        }
+    },
+    {
+        "model": "authentication.rolepermission",
+        "pk": 7,
+        "fields": {
+            "role_id": "d1c254b0-52e4-477c-a4ec-b248a39ca25e",
+            "permission_id": "afa691c2-783a-4561-a9f6-c522ad6ddab0"
+        }
+    },
+    {
+        "model": "authentication.rolepermission",
+        "pk": 8,
+        "fields": {
+            "role_id": "d1c254b0-52e4-477c-a4ec-b248a39ca25e",
+            "permission_id": "0822aba2-9300-469d-8524-3f15e46f09d3"
+        }
+    },
+    {
+        "model": "authentication.rolepermission",
+        "pk": 9,
+        "fields": {
+            "role_id": "d1c254b0-52e4-477c-a4ec-b248a39ca25e",
+            "permission_id": "50941aa6-5b08-40d1-9b34-aead94e8031e"
+        }
+    },
+    {
+        "model": "authentication.rolepermission",
+        "pk": 10,
+        "fields": {
+            "role_id": "d1c254b0-52e4-477c-a4ec-b248a39ca25e",
+            "permission_id": "abdee3c2-0668-44bd-9365-a225539f8b2b"
+        }
+    },
+    {
+        "model": "authentication.rolepermission",
+        "pk": 11,
+        "fields": {
+            "role_id": "d1c254b0-52e4-477c-a4ec-b248a39ca25e",
+            "permission_id": "707f67fc-140f-45a0-8672-ad9b83075481"
+        }
+    },
+    {
+        "model": "authentication.rolepermission",
+        "pk": 12,
+        "fields": {
+            "role_id": "d1c254b0-52e4-477c-a4ec-b248a39ca25e",
+            "permission_id": "a48ba58e-50c9-4d91-9619-77fd64b9da36"
+        }
+    },
+    {
+        "model": "authentication.rolepermission",
+        "pk": 13,
+        "fields": {
+            "role_id": "d1c254b0-52e4-477c-a4ec-b248a39ca25e",
+            "permission_id": "1dfac6f0-9022-435d-945f-20094f45465a"
+        }
+    },
+    {
+        "model": "authentication.rolepermission",
+        "pk": 14,
+        "fields": {
+            "role_id": "d1c254b0-52e4-477c-a4ec-b248a39ca25e",
+            "permission_id": "cc378fe9-4878-4ed3-a8ef-86d58253b727"
+        }
+    },
+    {
+        "model": "authentication.rolepermission",
+        "pk": 15,
+        "fields": {
+            "role_id": "d1c254b0-52e4-477c-a4ec-b248a39ca25e",
+            "permission_id": "923d9dd7-cb14-401a-bf74-11483afea7fc"
+        }
+    },
+    {
+        "model": "authentication.rolepermission",
+        "pk": 16,
+        "fields": {
+            "role_id": "d1c254b0-52e4-477c-a4ec-b248a39ca25e",
+            "permission_id": "7ad82241-a09e-4984-aeb1-bce36583cee2"
+        }
+    },
+    {
+        "model": "authentication.rolepermission",
+        "pk": 17,
+        "fields": {
+            "role_id": "d1c254b0-52e4-477c-a4ec-b248a39ca25e",
+            "permission_id": "911b9559-de8d-4118-84e2-38b6a677c241"
+        }
+    },
+    {
+        "model": "authentication.rolepermission",
+        "pk": 18,
+        "fields": {
+            "role_id": "d1c254b0-52e4-477c-a4ec-b248a39ca25e",
+            "permission_id": "ee08f78d-e7f6-4536-b3ac-57b461d703be"
+        }
+    },
+    {
+        "model": "authentication.rolepermission",
+        "pk": 19,
+        "fields": {
+            "role_id": "d1c254b0-52e4-477c-a4ec-b248a39ca25e",
+            "permission_id": "a20c5b15-f727-4926-8e61-6d18fc188193"
+        }
+    },
+    {
+        "model": "authentication.rolepermission",
+        "pk": 20,
+        "fields": {
+            "role_id": "d1c254b0-52e4-477c-a4ec-b248a39ca25e",
+            "permission_id": "a8d71d16-0f39-4902-8e68-452dd980f5d6"
+        }
+    },
+    {
+        "model": "authentication.rolepermission",
+        "pk": 21,
+        "fields": {
+            "role_id": "d1c254b0-52e4-477c-a4ec-b248a39ca25e",
+            "permission_id": "41a7b8bb-a948-4a65-8649-980d52200cce"
+        }
+    },
+    {
+        "model": "authentication.rolepermission",
+        "pk": 22,
+        "fields": {
+            "role_id": "d1c254b0-52e4-477c-a4ec-b248a39ca25e",
+            "permission_id": "48e5e2ce-142d-41f1-85f1-d1c6086e1943"
+        }
+    },
+    {
+        "model": "authentication.rolepermission",
+        "pk": 23,
+        "fields": {
+            "role_id": "d1c254b0-52e4-477c-a4ec-b248a39ca25e",
+            "permission_id": "04610852-7d34-415c-9180-f0c2f9802dbd"
+        }
+    },
+    {
+        "model": "authentication.rolepermission",
+        "pk": 24,
+        "fields": {
+            "role_id": "d1c254b0-52e4-477c-a4ec-b248a39ca25e",
+            "permission_id": "efe658b7-42f3-44a6-bd17-436f9eed5480"
+        }
+    },
+    {
+        "model": "authentication.rolepermission",
+        "pk": 25,
+        "fields": {
+            "role_id": "d1c254b0-52e4-477c-a4ec-b248a39ca25e",
+            "permission_id": "1ab03d2f-ed71-467d-9553-2ecb6655e494"
+        }
+    },
+    {
+        "model": "authentication.rolepermission",
+        "pk": 26,
+        "fields": {
+            "role_id": "d1c254b0-52e4-477c-a4ec-b248a39ca25e",
+            "permission_id": "7b8dfc56-abff-4b39-ab2f-596d76b81291"
+        }
+    },
+    {
+        "model": "authentication.rolepermission",
+        "pk": 27,
+        "fields": {
+            "role_id": "d1c254b0-52e4-477c-a4ec-b248a39ca25e",
+            "permission_id": "de9ad453-080f-4922-92bc-37e624b9ab71"
+        }
+    },
+    {
+        "model": "authentication.rolepermission",
+        "pk": 28,
+        "fields": {
+            "role_id": "d1c254b0-52e4-477c-a4ec-b248a39ca25e",
+            "permission_id": "054bdf0f-5533-427b-8f13-3dc8d8fc76f7"
+        }
+    },
+    {
+        "model": "authentication.rolepermission",
+        "pk": 29,
+        "fields": {
+            "role_id": "d1c254b0-52e4-477c-a4ec-b248a39ca25e",
+            "permission_id": "2af08669-5e00-48f4-8201-f0771305831c"
+        }
+    },
+    {
+        "model": "authentication.rolepermission",
+        "pk": 30,
+        "fields": {
+            "role_id": "d1c254b0-52e4-477c-a4ec-b248a39ca25e",
+            "permission_id": "f278093f-efd5-49c2-b8b5-bb37dff94ee4"
+        }
+    },
+    {
+        "model": "authentication.rolepermission",
+        "pk": 31,
+        "fields": {
+            "role_id": "d1c254b0-52e4-477c-a4ec-b248a39ca25e",
+            "permission_id": "0a3150ab-40ec-40f3-8b5e-ea9cf9a58652"
+        }
+    },
+    {
+        "model": "authentication.rolepermission",
+        "pk": 32,
+        "fields": {
+            "role_id": "d1c254b0-52e4-477c-a4ec-b248a39ca25e",
+            "permission_id": "c0795633-a3b5-489c-b39c-b09c4d613aab"
+        }
+    },
+    {
+        "model": "authentication.rolepermission",
+        "pk": 33,
+        "fields": {
+            "role_id": "d1c254b0-52e4-477c-a4ec-b248a39ca25e",
+            "permission_id": "6c803f4a-f84a-4ffe-a432-ca0083d1e8c9"
+        }
+    },
+    {
+        "model": "authentication.rolepermission",
+        "pk": 34,
+        "fields": {
+            "role_id": "d1c254b0-52e4-477c-a4ec-b248a39ca25e",
+            "permission_id": "64e3fa89-4c74-4369-b349-5076ac113090"
+        }
+    },
+    {
+        "model": "authentication.rolepermission",
+        "pk": 35,
+        "fields": {
+            "role_id": "d1c254b0-52e4-477c-a4ec-b248a39ca25e",
+            "permission_id": "6c1e20e1-6f2f-48e8-875d-80efb27554c8"
+        }
+    },
+    {
+        "model": "authentication.rolepermission",
+        "pk": 36,
+        "fields": {
+            "role_id": "d1c254b0-52e4-477c-a4ec-b248a39ca25e",
+            "permission_id": "cfd481a8-d878-4d48-aa57-2d25e5efa696"
+        }
+    },
+    {
+        "model": "authentication.rolepermission",
+        "pk": 37,
+        "fields": {
+            "role_id": "d1c254b0-52e4-477c-a4ec-b248a39ca25e",
+            "permission_id": "8ef24776-e63f-4a8d-a53a-e81fcd571037"
+        }
+    },
+    {
+        "model": "authentication.rolepermission",
+        "pk": 38,
+        "fields": {
+            "role_id": "d1c254b0-52e4-477c-a4ec-b248a39ca25e",
+            "permission_id": "21da5dbf-1b23-416f-8e68-bcffe4a211b7"
+        }
+    },
+    {
+        "model": "authentication.rolepermission",
+        "pk": 39,
+        "fields": {
+            "role_id": "d1c254b0-52e4-477c-a4ec-b248a39ca25e",
+            "permission_id": "3a49fb85-f69f-490d-a1a0-02793a19c69a"
+        }
+    },
+    {
+        "model": "authentication.rolepermission",
+        "pk": 40,
+        "fields": {
+            "role_id": "d1c254b0-52e4-477c-a4ec-b248a39ca25e",
+            "permission_id": "5372a5e7-ef74-4a92-90c1-3948fa6e53f5"
+        }
+    },
+    {
+        "model": "authentication.rolepermission",
+        "pk": 41,
+        "fields": {
+            "role_id": "d1c254b0-52e4-477c-a4ec-b248a39ca25e",
+            "permission_id": "cc7f455e-07f2-4586-9036-68548dfa0e36"
+        }
+    },
+    {
+        "model": "authentication.rolepermission",
+        "pk": 42,
+        "fields": {
+            "role_id": "d1c254b0-52e4-477c-a4ec-b248a39ca25e",
+            "permission_id": "52f915a2-1c93-47af-a3f1-5886f53609d9"
+        }
+    },
+    {
+        "model": "authentication.rolepermission",
+        "pk": 43,
+        "fields": {
+            "role_id": "d1c254b0-52e4-477c-a4ec-b248a39ca25e",
+            "permission_id": "64fb415c-8257-423b-b51b-281a9940e0e7"
+        }
+    },
+    {
+        "model": "authentication.rolepermission",
+        "pk": 44,
+        "fields": {
+            "role_id": "d1c254b0-52e4-477c-a4ec-b248a39ca25e",
+            "permission_id": "0ccd934e-c00b-43bb-89ae-f99fd24c906d"
+        }
+    },
+    {
+        "model": "authentication.rolepermission",
+        "pk": 45,
+        "fields": {
+            "role_id": "d1c254b0-52e4-477c-a4ec-b248a39ca25e",
+            "permission_id": "acff9e5b-f66b-4f24-b123-5bfa95f08806"
+        }
+    },
+    {
+        "model": "authentication.rolepermission",
+        "pk": 46,
+        "fields": {
+            "role_id": "d1c254b0-52e4-477c-a4ec-b248a39ca25e",
+            "permission_id": "f151e45e-0b08-4efb-8d7f-a3a6231a357f"
+        }
+    },
+    {
+        "model": "authentication.rolepermission",
+        "pk": 47,
+        "fields": {
+            "role_id": "d1c254b0-52e4-477c-a4ec-b248a39ca25e",
+            "permission_id": "6ba49168-6c84-48b9-9ed5-8c0aaad9d0c1"
+        }
+    },
+    {
+        "model": "authentication.rolepermission",
+        "pk": 48,
+        "fields": {
+            "role_id": "d1c254b0-52e4-477c-a4ec-b248a39ca25e",
+            "permission_id": "ef7db6a7-9a65-428a-97b3-a2f6d99f383b"
+        }
+    },
+    {
+        "model": "authentication.rolepermission",
+        "pk": 49,
+        "fields": {
+            "role_id": "d1c254b0-52e4-477c-a4ec-b248a39ca25e",
+            "permission_id": "c11a9198-2272-43ad-b400-ca4bede78a05"
+        }
+    },
+    {
+        "model": "authentication.rolepermission",
+        "pk": 50,
+        "fields": {
+            "role_id": "d1c254b0-52e4-477c-a4ec-b248a39ca25e",
+            "permission_id": "f71de8c6-d57a-4887-832b-8966ce4fcb7f"
+        }
+    },
+    {
+        "model": "authentication.rolepermission",
+        "pk": 51,
+        "fields": {
+            "role_id": "d1c254b0-52e4-477c-a4ec-b248a39ca25e",
+            "permission_id": "0cf7a0b6-e00b-4695-a780-7a50d59212f6"
+        }
+    },
+    {
+        "model": "authentication.rolepermission",
+        "pk": 52,
+        "fields": {
+            "role_id": "d1c254b0-52e4-477c-a4ec-b248a39ca25e",
+            "permission_id": "1a5ed9b7-05f8-4f62-8eff-5e1b459d91c7"
+        }
+    },
+    {
+        "model": "authentication.rolepermission",
+        "pk": 53,
+        "fields": {
+            "role_id": "d1c254b0-52e4-477c-a4ec-b248a39ca25e",
+            "permission_id": "f668d418-26a2-4ba3-a813-01ef12b1f114"
+        }
+    },
+    {
+        "model": "authentication.rolepermission",
+        "pk": 54,
+        "fields": {
+            "role_id": "d1c254b0-52e4-477c-a4ec-b248a39ca25e",
+            "permission_id": "3da9b8b8-f327-442d-807c-45c672381881"
+        }
+    },
+    {
+        "model": "authentication.rolepermission",
+        "pk": 55,
+        "fields": {
+            "role_id": "d1c254b0-52e4-477c-a4ec-b248a39ca25e",
+            "permission_id": "6ca5fafc-c112-428d-b2de-0e29a1b903ab"
+        }
+    },
+    {
+        "model": "authentication.rolepermission",
+        "pk": 56,
+        "fields": {
+            "role_id": "d1c254b0-52e4-477c-a4ec-b248a39ca25e",
+            "permission_id": "deb694a3-4495-45f7-824b-92c63329f93a"
+        }
+    },
+    {
+        "model": "authentication.rolepermission",
+        "pk": 57,
+        "fields": {
+            "role_id": "d1c254b0-52e4-477c-a4ec-b248a39ca25e",
+            "permission_id": "06bda848-af04-4cff-a2cc-40bdd6c5a29c"
+        }
+    },
+    {
+        "model": "authentication.rolepermission",
+        "pk": 58,
+        "fields": {
+            "role_id": "d1c254b0-52e4-477c-a4ec-b248a39ca25e",
+            "permission_id": "796ced3e-6ff7-4e75-9720-1943903b1285"
+        }
+    },
+    {
+        "model": "authentication.rolepermission",
+        "pk": 59,
+        "fields": {
+            "role_id": "d1c254b0-52e4-477c-a4ec-b248a39ca25e",
+            "permission_id": "ff890196-c1eb-4fb6-acbf-89df025f1b4d"
+        }
+    },
+    {
+        "model": "authentication.rolepermission",
+        "pk": 60,
+        "fields": {
+            "role_id": "d1c254b0-52e4-477c-a4ec-b248a39ca25e",
+            "permission_id": "ebf4bbc2-feb3-4129-ab56-b690cb7cec2f"
+        }
+    },
+    {
+        "model": "authentication.rolepermission",
+        "pk": 61,
+        "fields": {
+            "role_id": "83794e50-4df2-45e0-9428-cb4b2bf6db2a",
+            "permission_id": "7ad82241-a09e-4984-aeb1-bce36583cee2"
+        }
+    },
+    {
+        "model": "authentication.rolepermission",
+        "pk": 62,
+        "fields": {
+            "role_id": "83794e50-4df2-45e0-9428-cb4b2bf6db2a",
+            "permission_id": "911b9559-de8d-4118-84e2-38b6a677c241"
+        }
+    },
+    {
+        "model": "authentication.rolepermission",
+        "pk": 63,
+        "fields": {
+            "role_id": "83794e50-4df2-45e0-9428-cb4b2bf6db2a",
+            "permission_id": "ee08f78d-e7f6-4536-b3ac-57b461d703be"
+        }
+    },
+    {
+        "model": "authentication.rolepermission",
+        "pk": 64,
+        "fields": {
+            "role_id": "83794e50-4df2-45e0-9428-cb4b2bf6db2a",
+            "permission_id": "a20c5b15-f727-4926-8e61-6d18fc188193"
+        }
+    },
+    {
+        "model": "authentication.rolepermission",
+        "pk": 65,
+        "fields": {
+            "role_id": "83794e50-4df2-45e0-9428-cb4b2bf6db2a",
+            "permission_id": "a8d71d16-0f39-4902-8e68-452dd980f5d6"
+        }
+    },
+    {
+        "model": "authentication.rolepermission",
+        "pk": 66,
+        "fields": {
+            "role_id": "83794e50-4df2-45e0-9428-cb4b2bf6db2a",
+            "permission_id": "cfd481a8-d878-4d48-aa57-2d25e5efa696"
+        }
+    },
+    {
+        "model": "authentication.rolepermission",
+        "pk": 67,
+        "fields": {
+            "role_id": "83794e50-4df2-45e0-9428-cb4b2bf6db2a",
+            "permission_id": "8ef24776-e63f-4a8d-a53a-e81fcd571037"
+        }
+    },
+    {
+        "model": "authentication.rolepermission",
+        "pk": 68,
+        "fields": {
+            "role_id": "83794e50-4df2-45e0-9428-cb4b2bf6db2a",
+            "permission_id": "21da5dbf-1b23-416f-8e68-bcffe4a211b7"
+        }
+    },
+    {
+        "model": "authentication.rolepermission",
+        "pk": 69,
+        "fields": {
+            "role_id": "83794e50-4df2-45e0-9428-cb4b2bf6db2a",
+            "permission_id": "3a49fb85-f69f-490d-a1a0-02793a19c69a"
+        }
+    },
+    {
+        "model": "authentication.rolepermission",
+        "pk": 70,
+        "fields": {
+            "role_id": "83794e50-4df2-45e0-9428-cb4b2bf6db2a",
+            "permission_id": "5372a5e7-ef74-4a92-90c1-3948fa6e53f5"
+        }
+    },
+    {
+        "model": "authentication.rolepermission",
+        "pk": 71,
+        "fields": {
+            "role_id": "83794e50-4df2-45e0-9428-cb4b2bf6db2a",
+            "permission_id": "707f67fc-140f-45a0-8672-ad9b83075481"
+        }
+    },
+    {
+        "model": "authentication.rolepermission",
+        "pk": 72,
+        "fields": {
+            "role_id": "83794e50-4df2-45e0-9428-cb4b2bf6db2a",
+            "permission_id": "a48ba58e-50c9-4d91-9619-77fd64b9da36"
+        }
+    },
+    {
+        "model": "authentication.rolepermission",
+        "pk": 73,
+        "fields": {
+            "role_id": "83794e50-4df2-45e0-9428-cb4b2bf6db2a",
+            "permission_id": "1dfac6f0-9022-435d-945f-20094f45465a"
+        }
+    },
+    {
+        "model": "authentication.rolepermission",
+        "pk": 74,
+        "fields": {
+            "role_id": "83794e50-4df2-45e0-9428-cb4b2bf6db2a",
+            "permission_id": "deb694a3-4495-45f7-824b-92c63329f93a"
+        }
+    },
+    {
+        "model": "authentication.rolepermission",
+        "pk": 75,
+        "fields": {
+            "role_id": "83794e50-4df2-45e0-9428-cb4b2bf6db2a",
+            "permission_id": "41a7b8bb-a948-4a65-8649-980d52200cce"
+        }
+    },
+    {
+        "model": "authentication.rolepermission",
+        "pk": 76,
+        "fields": {
+            "role_id": "2a4fe5a7-f9d9-4836-8a56-4b68eef4b8fc",
+            "permission_id": "cc7f455e-07f2-4586-9036-68548dfa0e36"
+        }
+    },
+    {
+        "model": "authentication.rolepermission",
+        "pk": 77,
+        "fields": {
+            "role_id": "2a4fe5a7-f9d9-4836-8a56-4b68eef4b8fc",
+            "permission_id": "52f915a2-1c93-47af-a3f1-5886f53609d9"
+        }
+    },
+    {
+        "model": "authentication.rolepermission",
+        "pk": 78,
+        "fields": {
+            "role_id": "2a4fe5a7-f9d9-4836-8a56-4b68eef4b8fc",
+            "permission_id": "64fb415c-8257-423b-b51b-281a9940e0e7"
+        }
+    },
+    {
+        "model": "authentication.rolepermission",
+        "pk": 79,
+        "fields": {
+            "role_id": "2a4fe5a7-f9d9-4836-8a56-4b68eef4b8fc",
+            "permission_id": "0ccd934e-c00b-43bb-89ae-f99fd24c906d"
+        }
+    },
+    {
+        "model": "authentication.rolepermission",
+        "pk": 80,
+        "fields": {
+            "role_id": "2a4fe5a7-f9d9-4836-8a56-4b68eef4b8fc",
+            "permission_id": "acff9e5b-f66b-4f24-b123-5bfa95f08806"
+        }
+    },
+    {
+        "model": "authentication.rolepermission",
+        "pk": 81,
+        "fields": {
+            "role_id": "2a4fe5a7-f9d9-4836-8a56-4b68eef4b8fc",
+            "permission_id": "707f67fc-140f-45a0-8672-ad9b83075481"
+        }
+    },
+    {
+        "model": "authentication.rolepermission",
+        "pk": 82,
+        "fields": {
+            "role_id": "2a4fe5a7-f9d9-4836-8a56-4b68eef4b8fc",
+            "permission_id": "a48ba58e-50c9-4d91-9619-77fd64b9da36"
+        }
+    },
+    {
+        "model": "authentication.rolepermission",
+        "pk": 83,
+        "fields": {
+            "role_id": "2a4fe5a7-f9d9-4836-8a56-4b68eef4b8fc",
+            "permission_id": "1dfac6f0-9022-435d-945f-20094f45465a"
+        }
+    },
+    {
+        "model": "authentication.rolepermission",
+        "pk": 84,
+        "fields": {
+            "role_id": "2a4fe5a7-f9d9-4836-8a56-4b68eef4b8fc",
+            "permission_id": "cc378fe9-4878-4ed3-a8ef-86d58253b727"
+        }
+    },
+    {
+        "model": "authentication.rolepermission",
+        "pk": 85,
+        "fields": {
+            "role_id": "2a4fe5a7-f9d9-4836-8a56-4b68eef4b8fc",
+            "permission_id": "923d9dd7-cb14-401a-bf74-11483afea7fc"
+        }
+    },
+    {
+        "model": "authentication.rolepermission",
+        "pk": 86,
+        "fields": {
+            "role_id": "2a4fe5a7-f9d9-4836-8a56-4b68eef4b8fc",
+            "permission_id": "f151e45e-0b08-4efb-8d7f-a3a6231a357f"
+        }
+    },
+    {
+        "model": "authentication.rolepermission",
+        "pk": 87,
+        "fields": {
+            "role_id": "2a4fe5a7-f9d9-4836-8a56-4b68eef4b8fc",
+            "permission_id": "6ba49168-6c84-48b9-9ed5-8c0aaad9d0c1"
+        }
+    },
+    {
+        "model": "authentication.rolepermission",
+        "pk": 88,
+        "fields": {
+            "role_id": "2a4fe5a7-f9d9-4836-8a56-4b68eef4b8fc",
+            "permission_id": "ef7db6a7-9a65-428a-97b3-a2f6d99f383b"
+        }
+    },
+    {
+        "model": "authentication.rolepermission",
+        "pk": 89,
+        "fields": {
+            "role_id": "2a4fe5a7-f9d9-4836-8a56-4b68eef4b8fc",
+            "permission_id": "c11a9198-2272-43ad-b400-ca4bede78a05"
+        }
+    },
+    {
+        "model": "authentication.rolepermission",
+        "pk": 90,
+        "fields": {
+            "role_id": "2a4fe5a7-f9d9-4836-8a56-4b68eef4b8fc",
+            "permission_id": "f71de8c6-d57a-4887-832b-8966ce4fcb7f"
+        }
+    },
+    {
+        "model": "authentication.rolepermission",
+        "pk": 91,
+        "fields": {
+            "role_id": "2a4fe5a7-f9d9-4836-8a56-4b68eef4b8fc",
+            "permission_id": "deb694a3-4495-45f7-824b-92c63329f93a"
+        }
+    },
+    {
+        "model": "authentication.rolepermission",
+        "pk": 92,
+        "fields": {
+            "role_id": "e0eaea93-51bf-4b47-bbe5-5fef607d7f78",
+            "permission_id": "3cee2ac7-c9f7-4fc3-90cd-b3e57c2b10dd"
+        }
+    },
+    {
+        "model": "authentication.rolepermission",
+        "pk": 93,
+        "fields": {
+            "role_id": "e0eaea93-51bf-4b47-bbe5-5fef607d7f78",
+            "permission_id": "afa691c2-783a-4561-a9f6-c522ad6ddab0"
+        }
+    },
+    {
+        "model": "authentication.rolepermission",
+        "pk": 94,
+        "fields": {
+            "role_id": "e0eaea93-51bf-4b47-bbe5-5fef607d7f78",
+            "permission_id": "0822aba2-9300-469d-8524-3f15e46f09d3"
+        }
+    },
+    {
+        "model": "authentication.rolepermission",
+        "pk": 95,
+        "fields": {
+            "role_id": "e0eaea93-51bf-4b47-bbe5-5fef607d7f78",
+            "permission_id": "50941aa6-5b08-40d1-9b34-aead94e8031e"
+        }
+    },
+    {
+        "model": "authentication.rolepermission",
+        "pk": 96,
+        "fields": {
+            "role_id": "e0eaea93-51bf-4b47-bbe5-5fef607d7f78",
+            "permission_id": "abdee3c2-0668-44bd-9365-a225539f8b2b"
+        }
+    },
+    {
+        "model": "authentication.rolepermission",
+        "pk": 97,
+        "fields": {
+            "role_id": "e0eaea93-51bf-4b47-bbe5-5fef607d7f78",
+            "permission_id": "707f67fc-140f-45a0-8672-ad9b83075481"
+        }
+    },
+    {
+        "model": "authentication.rolepermission",
+        "pk": 98,
+        "fields": {
+            "role_id": "e0eaea93-51bf-4b47-bbe5-5fef607d7f78",
+            "permission_id": "a48ba58e-50c9-4d91-9619-77fd64b9da36"
+        }
+    },
+    {
+        "model": "authentication.rolepermission",
+        "pk": 99,
+        "fields": {
+            "role_id": "e0eaea93-51bf-4b47-bbe5-5fef607d7f78",
+            "permission_id": "1dfac6f0-9022-435d-945f-20094f45465a"
+        }
+    },
+    {
+        "model": "authentication.rolepermission",
+        "pk": 100,
+        "fields": {
+            "role_id": "e0eaea93-51bf-4b47-bbe5-5fef607d7f78",
+            "permission_id": "588c69b5-25ca-4257-9c0f-f990f2fb3ccb"
+        }
+    },
+    {
+        "model": "authentication.rolepermission",
+        "pk": 101,
+        "fields": {
+            "role_id": "e0eaea93-51bf-4b47-bbe5-5fef607d7f78",
+            "permission_id": "deb694a3-4495-45f7-824b-92c63329f93a"
+        }
+    },
+    {
+        "model": "authentication.rolepermission",
+        "pk": 102,
+        "fields": {
+            "role_id": "18f9be3d-3b95-4eb8-b2ef-34db22bafe3d",
+            "permission_id": "0a3150ab-40ec-40f3-8b5e-ea9cf9a58652"
+        }
+    },
+    {
+        "model": "authentication.rolepermission",
+        "pk": 103,
+        "fields": {
+            "role_id": "18f9be3d-3b95-4eb8-b2ef-34db22bafe3d",
+            "permission_id": "c0795633-a3b5-489c-b39c-b09c4d613aab"
+        }
+    },
+    {
+        "model": "authentication.rolepermission",
+        "pk": 104,
+        "fields": {
+            "role_id": "18f9be3d-3b95-4eb8-b2ef-34db22bafe3d",
+            "permission_id": "6c803f4a-f84a-4ffe-a432-ca0083d1e8c9"
+        }
+    },
+    {
+        "model": "authentication.rolepermission",
+        "pk": 105,
+        "fields": {
+            "role_id": "18f9be3d-3b95-4eb8-b2ef-34db22bafe3d",
+            "permission_id": "64e3fa89-4c74-4369-b349-5076ac113090"
+        }
+    },
+    {
+        "model": "authentication.rolepermission",
+        "pk": 106,
+        "fields": {
+            "role_id": "18f9be3d-3b95-4eb8-b2ef-34db22bafe3d",
+            "permission_id": "6c1e20e1-6f2f-48e8-875d-80efb27554c8"
+        }
+    },
+    {
+        "model": "authentication.rolepermission",
+        "pk": 107,
+        "fields": {
+            "role_id": "18f9be3d-3b95-4eb8-b2ef-34db22bafe3d",
+            "permission_id": "41a7b8bb-a948-4a65-8649-980d52200cce"
+        }
+    },
+    {
+        "model": "authentication.rolepermission",
+        "pk": 108,
+        "fields": {
+            "role_id": "18f9be3d-3b95-4eb8-b2ef-34db22bafe3d",
+            "permission_id": "48e5e2ce-142d-41f1-85f1-d1c6086e1943"
+        }
+    },
+    {
+        "model": "authentication.rolepermission",
+        "pk": 109,
+        "fields": {
+            "role_id": "18f9be3d-3b95-4eb8-b2ef-34db22bafe3d",
+            "permission_id": "04610852-7d34-415c-9180-f0c2f9802dbd"
+        }
+    },
+    {
+        "model": "authentication.rolepermission",
+        "pk": 110,
+        "fields": {
+            "role_id": "18f9be3d-3b95-4eb8-b2ef-34db22bafe3d",
+            "permission_id": "efe658b7-42f3-44a6-bd17-436f9eed5480"
+        }
+    },
+    {
+        "model": "authentication.rolepermission",
+        "pk": 111,
+        "fields": {
+            "role_id": "18f9be3d-3b95-4eb8-b2ef-34db22bafe3d",
+            "permission_id": "1ab03d2f-ed71-467d-9553-2ecb6655e494"
+        }
+    },
+    {
+        "model": "authentication.rolepermission",
+        "pk": 112,
+        "fields": {
+            "role_id": "18f9be3d-3b95-4eb8-b2ef-34db22bafe3d",
+            "permission_id": "3cee2ac7-c9f7-4fc3-90cd-b3e57c2b10dd"
+        }
+    },
+    {
+        "model": "authentication.rolepermission",
+        "pk": 113,
+        "fields": {
+            "role_id": "18f9be3d-3b95-4eb8-b2ef-34db22bafe3d",
+            "permission_id": "abdee3c2-0668-44bd-9365-a225539f8b2b"
+        }
+    },
+    {
+        "model": "authentication.rolepermission",
+        "pk": 114,
+        "fields": {
+            "role_id": "18f9be3d-3b95-4eb8-b2ef-34db22bafe3d",
+            "permission_id": "deb694a3-4495-45f7-824b-92c63329f93a"
+        }
+    },
+    {
+        "model": "authentication.rolepermission",
+        "pk": 115,
+        "fields": {
+            "role_id": "ba71c84f-e25f-4d92-bf3e-1ed1e1f76228",
+            "permission_id": "7b8dfc56-abff-4b39-ab2f-596d76b81291"
+        }
+    },
+    {
+        "model": "authentication.rolepermission",
+        "pk": 116,
+        "fields": {
+            "role_id": "ba71c84f-e25f-4d92-bf3e-1ed1e1f76228",
+            "permission_id": "de9ad453-080f-4922-92bc-37e624b9ab71"
+        }
+    },
+    {
+        "model": "authentication.rolepermission",
+        "pk": 117,
+        "fields": {
+            "role_id": "ba71c84f-e25f-4d92-bf3e-1ed1e1f76228",
+            "permission_id": "054bdf0f-5533-427b-8f13-3dc8d8fc76f7"
+        }
+    },
+    {
+        "model": "authentication.rolepermission",
+        "pk": 118,
+        "fields": {
+            "role_id": "ba71c84f-e25f-4d92-bf3e-1ed1e1f76228",
+            "permission_id": "2af08669-5e00-48f4-8201-f0771305831c"
+        }
+    },
+    {
+        "model": "authentication.rolepermission",
+        "pk": 119,
+        "fields": {
+            "role_id": "ba71c84f-e25f-4d92-bf3e-1ed1e1f76228",
+            "permission_id": "f278093f-efd5-49c2-b8b5-bb37dff94ee4"
+        }
+    },
+    {
+        "model": "authentication.rolepermission",
+        "pk": 120,
+        "fields": {
+            "role_id": "ba71c84f-e25f-4d92-bf3e-1ed1e1f76228",
+            "permission_id": "0cf7a0b6-e00b-4695-a780-7a50d59212f6"
+        }
+    },
+    {
+        "model": "authentication.rolepermission",
+        "pk": 121,
+        "fields": {
+            "role_id": "ba71c84f-e25f-4d92-bf3e-1ed1e1f76228",
+            "permission_id": "1a5ed9b7-05f8-4f62-8eff-5e1b459d91c7"
+        }
+    },
+    {
+        "model": "authentication.rolepermission",
+        "pk": 122,
+        "fields": {
+            "role_id": "ba71c84f-e25f-4d92-bf3e-1ed1e1f76228",
+            "permission_id": "f668d418-26a2-4ba3-a813-01ef12b1f114"
+        }
+    },
+    {
+        "model": "authentication.rolepermission",
+        "pk": 123,
+        "fields": {
+            "role_id": "ba71c84f-e25f-4d92-bf3e-1ed1e1f76228",
+            "permission_id": "3da9b8b8-f327-442d-807c-45c672381881"
+        }
+    },
+    {
+        "model": "authentication.rolepermission",
+        "pk": 124,
+        "fields": {
+            "role_id": "ba71c84f-e25f-4d92-bf3e-1ed1e1f76228",
+            "permission_id": "6ca5fafc-c112-428d-b2de-0e29a1b903ab"
+        }
+    },
+    {
+        "model": "authentication.rolepermission",
+        "pk": 125,
+        "fields": {
+            "role_id": "ba71c84f-e25f-4d92-bf3e-1ed1e1f76228",
+            "permission_id": "f151e45e-0b08-4efb-8d7f-a3a6231a357f"
+        }
+    },
+    {
+        "model": "authentication.rolepermission",
+        "pk": 126,
+        "fields": {
+            "role_id": "ba71c84f-e25f-4d92-bf3e-1ed1e1f76228",
+            "permission_id": "707f67fc-140f-45a0-8672-ad9b83075481"
+        }
+    },
+    {
+        "model": "authentication.rolepermission",
+        "pk": 127,
+        "fields": {
+            "role_id": "ba71c84f-e25f-4d92-bf3e-1ed1e1f76228",
+            "permission_id": "deb694a3-4495-45f7-824b-92c63329f93a"
+        }
+    }
+]

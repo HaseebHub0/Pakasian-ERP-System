@@ -1,0 +1,142 @@
+[
+    {
+        "model": "finance.account",
+        "pk": 1000,
+        "fields": {
+            "name": "Cash",
+            "type": "Asset",
+            "description": "Physical cash on hand",
+            "is_active": true
+        }
+    },
+    {
+        "model": "finance.account",
+        "pk": 1100,
+        "fields": {
+            "name": "Bank Account",
+            "type": "Asset",
+            "description": "Company bank accounts",
+            "is_active": true
+        }
+    },
+    {
+        "model": "finance.account",
+        "pk": 1200,
+        "fields": {
+            "name": "Accounts Receivable",
+            "type": "Asset",
+            "description": "Amounts owed by customers",
+            "is_active": true
+        }
+    },
+    {
+        "model": "finance.account",
+        "pk": 1300,
+        "fields": {
+            "name": "Raw Material Inventory",
+            "type": "Asset",
+            "description": "Value of raw materials held in stock",
+            "is_active": true
+        }
+    },
+    {
+        "model": "finance.account",
+        "pk": 1310,
+        "fields": {
+            "name": "Packaging Inventory",
+            "type": "Asset",
+            "description": "Value of packaging materials held in stock",
+            "is_active": true
+        }
+    },
+    {
+        "model": "finance.account",
+        "pk": 1320,
+        "fields": {
+            "name": "Work In Progress",
+            "type": "Asset",
+            "description": "Value of partially manufactured goods",
+            "is_active": true
+        }
+    },
+    {
+        "model": "finance.account",
+        "pk": 1330,
+        "fields": {
+            "name": "Finished Goods Inventory",
+            "type": "Asset",
+            "description": "Value of completed products ready for sale",
+            "is_active": true
+        }
+    },
+    {
+        "model": "finance.account",
+        "pk": 2000,
+        "fields": {
+            "name": "Accounts Payable",
+            "type": "Liability",
+            "description": "Amounts owed to suppliers",
+            "is_active": true
+        }
+    },
+    {
+        "model": "finance.account",
+        "pk": 2200,
+        "fields": {
+            "name": "Sales Tax Payable",
+            "type": "Liability",
+            "description": "GST / sales tax collected and owed to FBR",
+            "is_active": true
+        }
+    },
+    {
+        "model": "finance.account",
+        "pk": 4000,
+        "fields": {
+            "name": "Sales Revenue",
+            "type": "Revenue",
+            "description": "Revenue from product sales",
+            "is_active": true
+        }
+    },
+    {
+        "model": "finance.account",
+        "pk": 5000,
+        "fields": {
+            "name": "Cost of Goods Sold",
+            "type": "Expense",
+            "description": "Direct cost of products sold",
+            "is_active": true
+        }
+    },
+    {
+        "model": "finance.account",
+        "pk": 5100,
+        "fields": {
+            "name": "Factory Labour",
+            "type": "Expense",
+            "description": "Direct and indirect factory labour costs",
+            "is_active": true
+        }
+    },
+    {
+        "model": "finance.account",
+        "pk": 5200,
+        "fields": {
+            "name": "Electricity",
+            "type": "Expense",
+            "description": "Factory electricity and utility costs",
+            "is_active": true
+        }
+    },
+    {
+        "model": "finance.account",
+        "pk": 5300,
+        "fields": {
+            "name": "Factory Rent",
+            "type": "Expense",
+            "description": "Rent expense for the factory premises",
+            "is_active": true
+        }
+    }
+]

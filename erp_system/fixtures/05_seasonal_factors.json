@@ -1,0 +1,42 @@
+[
+    {
+        "model": "mrp.seasonalconfig",
+        "pk": 1,
+        "fields": {
+            "season": "Ramadan",
+            "multiplier": "1.35",
+            "description": "35% uplift in demand during the Ramadan holy month — higher consumption of snack foods at Iftar",
+            "is_active": true
+        }
+    },
+    {
+        "model": "mrp.seasonalconfig",
+        "pk": 2,
+        "fields": {
+            "season": "Eid ul Adha",
+            "multiplier": "1.25",
+            "description": "25% uplift in demand during Eid ul Adha celebrations",
+            "is_active": true
+        }
+    },
+    {
+        "model": "mrp.seasonalconfig",
+        "pk": 3,
+        "fields": {
+            "season": "Winter",
+            "multiplier": "1.15",
+            "description": "15% uplift during winter months (Nov–Feb) — increased savoury snack consumption",
+            "is_active": true
+        }
+    },
+    {
+        "model": "mrp.seasonalconfig",
+        "pk": 4,
+        "fields": {
+            "season": "Summer",
+            "multiplier": "0.90",
+            "description": "10% reduction during peak summer months (May–Aug) — lower appetite for fried snacks",
+            "is_active": true
+        }
+    }
+]
