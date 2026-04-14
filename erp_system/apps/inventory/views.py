@@ -1,6 +1,8 @@
 from rest_framework import viewsets, status
 from rest_framework.response import Response
-from rest_framework.decorators import action
+from rest_framework.decorators import action, api_view, permission_classes
+from rest_framework.permissions import IsAuthenticated
+from django.shortcuts import get_object_or_404
 from django.db import transaction
 from .models import (
     InventoryLedger, BatchTable, InventorySummary, StockTransfer,
@@ -11,6 +13,135 @@ from .serializers import (
     StockTransferSerializer, TransferItemSerializer, StockReservationSerializer,
     WarehousePickingSerializer, PickingItemSerializer, InventoryAdjustmentSerializer
 )
+
+
+# ─────────────────────────────────────────────────────────────────────────────
+# Batch Traceability Endpoint
+# GET /api/inventory/batches/{batch_number}/trace/
+# ─────────────────────────────────────────────────────────────────────────────
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def batch_trace(request, batch_number):
+    """
+    Full end-to-end traceability for a production batch:
+      - batch_info        : BatchTable details + product name
+      - raw_materials     : every MaterialIssue with material & supplier info
+      - production_stages : BatchStageLog ordered by stage sequence
+      - yield             : ProductionYield record
+      - oil_logs          : OilConsumptionLog entries
+      - costing           : BatchCostSummary
+      - distribution      : Sales-dispatch ledger lines for the batch
+    """
+    from apps.manufacturing.models import (
+        ProductionBatch, MaterialIssue, BatchStageLog,
+        ProductionYield, OilConsumptionLog, BatchCostSummary,
+    )
+    from apps.manufacturing.serializers import (
+        ProductionBatchSerializer, MaterialIssueSerializer, BatchStageLogSerializer,
+        ProductionYieldSerializer, OilConsumptionLogSerializer, BatchCostSummarySerializer,
+    )
+
+    # ── 1. Resolve the inventory batch (404 if not found) ──────────────────
+    inv_batch  = get_object_or_404(
+        BatchTable.objects.select_related('product_id', 'material_id'),
+        batch_number=batch_number,
+    )
+
+    # ── 2. Resolve the production batch (may not exist yet) ─────────────────
+    prod_batch = ProductionBatch.objects.filter(batch_number=batch_number).first()
+
+    # ── 3. Build batch_info ─────────────────────────────────────────────────
+    batch_info = {
+        'batch_number'   : inv_batch.batch_number,
+        'production_date': str(inv_batch.production_date),
+        'expiry_date'    : str(inv_batch.expiry_date) if inv_batch.expiry_date else None,
+        'status'         : inv_batch.status,
+        'product_id'     : str(inv_batch.product_id_id) if inv_batch.product_id_id else None,
+        'product_name'   : (
+            inv_batch.product_id.product_name if inv_batch.product_id else None
+        ),
+        'product_sku'    : (
+            inv_batch.product_id.sku_code if inv_batch.product_id else None
+        ),
+        'material_id'    : str(inv_batch.material_id_id) if inv_batch.material_id_id else None,
+        'material_name'  : (
+            inv_batch.material_id.material_name if inv_batch.material_id else None
+        ),
+    }
+
+    # If no production batch exists yet return partial info
+    if prod_batch is None:
+        return Response({
+            'batch_info'       : batch_info,
+            'production_record': None,
+            'raw_materials'    : [],
+            'production_stages': [],
+            'yield'            : None,
+            'oil_logs'         : [],
+            'costing'          : None,
+            'distribution'     : [],
+            'warning'          : 'No production batch record found for this batch number.',
+        })
+
+    # ── 4. Enrich batch_info with production details ─────────────────────────
+    batch_info.update({
+        'production_batch_id': str(prod_batch.id),
+        'planned_quantity'   : str(prod_batch.planned_quantity),
+        'start_datetime'     : prod_batch.start_datetime.isoformat() if prod_batch.start_datetime else None,
+        'end_datetime'       : prod_batch.end_datetime.isoformat()   if prod_batch.end_datetime   else None,
+        'production_status'  : prod_batch.status,
+    })
+
+    # ── 5. Pull related records ──────────────────────────────────────────────
+    raw_materials = (
+        MaterialIssue.objects
+        .filter(batch_id=prod_batch.id)
+        .select_related('material_id', 'supplier_id', 'issued_by')
+    )
+
+    production_stages = (
+        BatchStageLog.objects
+        .filter(batch_id=prod_batch.id)
+        .select_related('stage_id', 'operator_id', 'machine_id')
+        .order_by('stage_id__sequence_number')
+    )
+
+    yield_record = (
+        ProductionYield.objects
+        .filter(batch_id=prod_batch.id)
+        .select_related('recorded_by')
+        .first()
+    )
+
+    oil_logs = (
+        OilConsumptionLog.objects
+        .filter(batch_id=prod_batch.id)
+        .select_related('material_id', 'logged_by')
+    )
+
+    costing = (
+        BatchCostSummary.objects
+        .filter(batch_id=prod_batch.id)
+        .select_related('calculated_by')
+        .first()
+    )
+
+    distribution = (
+        InventoryLedger.objects
+        .filter(batch_number=batch_number, movement_type='DISPATCH')
+        .select_related('warehouse_id', 'user_id')
+    )
+
+    # ── 6. Serialize & return ────────────────────────────────────────────────
+    return Response({
+        'batch_info'       : batch_info,
+        'raw_materials'    : MaterialIssueSerializer(raw_materials,       many=True).data,
+        'production_stages': BatchStageLogSerializer(production_stages,   many=True).data,
+        'yield'            : ProductionYieldSerializer(yield_record).data if yield_record else None,
+        'oil_logs'         : OilConsumptionLogSerializer(oil_logs,        many=True).data,
+        'costing'          : BatchCostSummarySerializer(costing).data     if costing else None,
+        'distribution'     : InventoryLedgerSerializer(distribution,      many=True).data,
+    })
 
 class InventoryLedgerViewSet(viewsets.ReadOnlyModelViewSet):
     queryset = InventoryLedger.objects.all()

@@ -3,18 +3,21 @@ from rest_framework.routers import DefaultRouter
 from .views import (
     InventoryLedgerViewSet, BatchTableViewSet, InventorySummaryViewSet,
     StockTransferViewSet, StockReservationViewSet, WarehousePickingViewSet,
-    InventoryAdjustmentViewSet
+    InventoryAdjustmentViewSet, batch_trace,
 )
 
 router = DefaultRouter()
-router.register(r'ledger', InventoryLedgerViewSet, basename='inventory-ledger')
-router.register(r'batch-table', BatchTableViewSet, basename='batch-table')
-router.register(r'summary', InventorySummaryViewSet, basename='inventory-summary')
-router.register(r'stock-transfers', StockTransferViewSet, basename='stock-transfer')
-router.register(r'stock-reservations', StockReservationViewSet, basename='stock-reservation')
-router.register(r'warehouse-picking', WarehousePickingViewSet, basename='warehouse-picking')
-router.register(r'adjustments', InventoryAdjustmentViewSet, basename='inventory-adjustment')
+router.register(r'ledger',              InventoryLedgerViewSet,    basename='inventory-ledger')
+router.register(r'batch-table',         BatchTableViewSet,         basename='batch-table')
+router.register(r'summary',            InventorySummaryViewSet,    basename='inventory-summary')
+router.register(r'stock-transfers',    StockTransferViewSet,        basename='stock-transfer')
+router.register(r'stock-reservations', StockReservationViewSet,    basename='stock-reservation')
+router.register(r'warehouse-picking',  WarehousePickingViewSet,     basename='warehouse-picking')
+router.register(r'adjustments',        InventoryAdjustmentViewSet,  basename='inventory-adjustment')
 
 urlpatterns = [
+    # Batch traceability
+    path('batches/<str:batch_number>/trace/', batch_trace, name='batch-trace'),
+    # Standard CRUD ViewSets
     path('', include(router.urls)),
 ]
