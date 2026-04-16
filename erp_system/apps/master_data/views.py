@@ -43,6 +43,23 @@ class ProductViewSet(viewsets.ModelViewSet):
     serializer_class = ProductSerializer
     permission_classes = [IsAuthenticated]
     filterset_fields = ['status', 'brand', 'category_id']
+    search_fields = ['product_name', 'sku_code', 'barcode']
+
+    def perform_create(self, serializer):
+        """Override to write an AuditLog entry on every product INSERT."""
+        import json
+        from apps.core.models import AuditLog
+        instance = serializer.save()
+        # Serializer ReturnDict may contain UUID / Decimal objects — normalise via JSON round-trip
+        raw_data = dict(self.get_serializer(instance).data)
+        safe_data = json.loads(json.dumps(raw_data, default=str))
+        AuditLog.objects.create(
+            user_id=self.request.user.id if self.request.user.is_authenticated else None,
+            action='INSERT',
+            entity_type='products',
+            entity_id=instance.id,
+            new_value=safe_data,
+        )
 
     def destroy(self, request, *args, **kwargs):
         """Soft delete — set status=inactive instead of removing the row."""
@@ -101,11 +118,11 @@ class RawMaterialViewSet(viewsets.ModelViewSet):
         from apps.inventory.models import InventorySummary
         from django.db.models import F
 
-        # Subquery: sum available_stock for this material across all warehouse bins
+        # Subquery: sum available_stock for this material across all warehouses
         stock_subq = (
             InventorySummary.objects
-            .filter(product_id=OuterRef('pk'))
-            .values('product_id')
+            .filter(material_id=OuterRef('pk'))
+            .values('material_id')
             .annotate(total=Sum('available_stock'))
             .values('total')[:1]
         )

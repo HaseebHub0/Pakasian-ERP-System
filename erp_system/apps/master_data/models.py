@@ -42,6 +42,10 @@ class Product(BaseModel):
     barcode        = models.CharField(max_length=100, unique=True, db_column='barcode')
     shelf_life_days = models.IntegerField(db_column='shelf_life_days')
     standard_cost  = models.DecimalField(max_digits=14, decimal_places=4, db_column='standard_cost')
+    selling_price  = models.DecimalField(
+        max_digits=14, decimal_places=4, default=0, db_column='selling_price',
+        help_text='Retail / distributor selling price used for SKU profitability',
+    )
     status         = models.CharField(
         max_length=20,
         choices=STATUS_CHOICES,
@@ -230,3 +234,47 @@ class Machine(BaseModel):
 
     def __str__(self):
         return f"{self.machine_name} ({self.machine_type})"
+
+
+# ─────────────────────────────────────────────────────────────────────────────
+# Vehicle  (used by sales dispatch_orders.vehicle_id)
+# ─────────────────────────────────────────────────────────────────────────────
+class Vehicle(BaseModel):
+    VEHICLE_TYPE_CHOICES = [
+        ('Truck',       'Truck'),
+        ('Mini Truck',  'Mini Truck'),
+        ('Van',         'Van'),
+        ('Motorcycle',  'Motorcycle'),
+        ('Rikshaw',     'Rikshaw'),
+    ]
+    STATUS_CHOICES = [
+        ('active',      'Active'),
+        ('inactive',    'Inactive'),
+        ('maintenance', 'Under Maintenance'),
+    ]
+
+    registration_number = models.CharField(
+        max_length=50, unique=True, db_column='registration_number',
+    )
+    vehicle_type        = models.CharField(
+        max_length=30, choices=VEHICLE_TYPE_CHOICES, default='Truck',
+        db_column='vehicle_type',
+    )
+    capacity_kg         = models.DecimalField(
+        max_digits=10, decimal_places=2, default=0,
+        db_column='capacity_kg',
+        help_text='Max load capacity in kilograms',
+    )
+    driver_name         = models.CharField(
+        max_length=150, blank=True, default='', db_column='driver_name',
+    )
+    status              = models.CharField(
+        max_length=20, choices=STATUS_CHOICES, default='active', db_column='status',
+    )
+
+    class Meta:
+        db_table = 'vehicles'
+        ordering = ['registration_number']
+
+    def __str__(self):
+        return f"{self.registration_number} ({self.vehicle_type})"

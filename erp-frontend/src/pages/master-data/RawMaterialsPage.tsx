@@ -18,7 +18,7 @@ const rawMaterialSchema = z.object({
   safety_stock: z.coerce.number().min(0, "Must be positive number").default(0),
   reorder_level: z.coerce.number().min(0, "Must be positive number").default(0),
   shelf_life_days: z.coerce.number().nullable().optional(),
-  status: z.enum(["Active", "Inactive"]).default("Active"),
+  status: z.enum(["active", "inactive"]).default("active").optional(),
 });
 
 type RawMaterialFormValues = z.infer<typeof rawMaterialSchema>;
@@ -72,7 +72,7 @@ export default function RawMaterialsPage() {
   const updateMutation = useUpdateRawMaterial();
 
   const handleToggleStatus = (material: RawMaterial) => {
-    const newStatus = material.status === "Active" ? "Inactive" : "Active";
+    const newStatus = material.status === "active" ? "inactive" : "active";
     updateMutation.mutate(
       { id: material.id, data: { status: newStatus } },
       {
@@ -102,7 +102,7 @@ export default function RawMaterialsPage() {
     return data.results.filter(mat => {
       const currentStock = inventoryMap.get(mat.material_code) ?? inventoryMap.get(mat.id) ?? 0;
       const reorderLevel = mat.reorder_level || 0;
-      return currentStock < reorderLevel && mat.status === 'Active';
+      return currentStock < reorderLevel && mat.status !== 'inactive';
     }).length;
   }, [data?.results, inventoryMap]);
 
@@ -182,7 +182,7 @@ export default function RawMaterialsPage() {
                   
                   // Compute Stock Color
                   let stockColor = "bg-gray-100 text-gray-800 border-gray-200";
-                  if (mat.status === 'Active') {
+                  if (mat.status === 'active') {
                      if (currentStock < reorderLevel) {
                        stockColor = "bg-red-50 text-red-700 font-bold border-red-200";
                      } else if (currentStock < safetyLevel) {
@@ -215,7 +215,7 @@ export default function RawMaterialsPage() {
                       <td className="px-6 py-4 text-sm border-b border-gray-100">
                         <span
                           className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
-                            mat.status === "Active"
+                            mat.status === "active"
                               ? "bg-green-100 text-green-800"
                               : "bg-gray-100 text-gray-800"
                           }`}
@@ -235,11 +235,11 @@ export default function RawMaterialsPage() {
                           <button
                             onClick={() => handleToggleStatus(mat)}
                             className={`${
-                              mat.status === "Active" ? "text-red-500" : "text-green-500"
+                              mat.status === "active" ? "text-red-500" : "text-green-500"
                             } hover:opacity-80 transition`}
-                            title={mat.status === "Active" ? "Deactivate" : "Activate"}
+                            title={mat.status === "active" ? "Deactivate" : "Activate"}
                           >
-                            {mat.status === "Active" ? <ToggleRight size={20} /> : <ToggleLeft size={20} />}
+                            {mat.status === "active" ? <ToggleRight size={20} /> : <ToggleLeft size={20} />}
                           </button>
                         </div>
                       </td>
@@ -320,7 +320,7 @@ function RawMaterialModal({
           material_type: initialData.material_type as any, // type casting map
         }
       : {
-          status: "Active",
+          status: "active" as const,
           material_type: "ingredient",
           standard_cost: 0,
           safety_stock: 0,
@@ -467,8 +467,8 @@ function RawMaterialModal({
                 {...register("status")}
                 className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white shadow-sm"
               >
-                <option value="Active">Active</option>
-                <option value="Inactive">Inactive</option>
+                <option value="active">Active</option>
+                <option value="inactive">Inactive</option>
               </select>
             </div>
           </div>

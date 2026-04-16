@@ -18,7 +18,7 @@ const supplierSchema = z.object({
   currency: z.string().default("PKR"),
   lead_time_days: z.coerce.number().nullable().optional(),
   rating: z.coerce.number().min(1).max(5).default(5),
-  status: z.enum(["Active", "Inactive"]).default("Active"),
+  status: z.enum(["active", "inactive"]).default("active").optional(),
 });
 
 type SupplierFormValues = z.infer<typeof supplierSchema>;
@@ -181,7 +181,7 @@ function SupplierRow({ supplier, onEdit }: { supplier: Supplier; onEdit: (s: Sup
 
   const handleToggleStatus = (e: React.MouseEvent) => {
     e.stopPropagation();
-    const newStatus = supplier.status === "Active" ? "Inactive" : "Active";
+    const newStatus = supplier.status === "active" ? "inactive" : "active";
     updateMutation.mutate(
       { id: supplier.id, data: { status: newStatus } },
       {
@@ -213,7 +213,7 @@ function SupplierRow({ supplier, onEdit }: { supplier: Supplier; onEdit: (s: Sup
         <td className="px-6 py-4 text-sm border-b border-gray-100">
           <span
             className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
-              supplier.status === "Active"
+              supplier.status === "active"
                 ? "bg-green-100 text-green-800"
                 : "bg-gray-100 text-gray-800"
             }`}
@@ -236,11 +236,11 @@ function SupplierRow({ supplier, onEdit }: { supplier: Supplier; onEdit: (s: Sup
             <button
               onClick={handleToggleStatus}
               className={`${
-                supplier.status === "Active" ? "text-red-500" : "text-green-500"
+                supplier.status === "active" ? "text-red-500" : "text-green-500"
               } hover:opacity-80 transition`}
-              title={supplier.status === "Active" ? "Deactivate" : "Activate"}
+              title={supplier.status === "active" ? "Deactivate" : "Activate"}
             >
-              {supplier.status === "Active" ? <ToggleRight size={20} /> : <ToggleLeft size={20} />}
+              {supplier.status === "active" ? <ToggleRight size={20} /> : <ToggleLeft size={20} />}
             </button>
           </div>
         </td>
@@ -258,7 +258,7 @@ function SupplierRow({ supplier, onEdit }: { supplier: Supplier; onEdit: (s: Sup
   );
 }
 
-function SupplierDetails({ supplierId }: { supplierId: number }) {
+function SupplierDetails({ supplierId }: { supplierId: string }) {
   const { data: materials, isLoading: matsLoading } = useSupplierMaterials(supplierId);
   const { data: pos, isLoading: posLoading } = useSupplierPurchaseOrders(supplierId);
 
@@ -406,7 +406,7 @@ function SupplierModal({
           currency: "PKR",
           payment_terms: "Cash",
           rating: 5,
-          status: "Active",
+          status: "active" as const,
         },
   });
 
@@ -536,8 +536,8 @@ function SupplierModal({
                 {...register("status")}
                 className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white shadow-sm"
               >
-                <option value="Active">Active</option>
-                <option value="Inactive">Inactive</option>
+                <option value="active">Active</option>
+                <option value="inactive">Inactive</option>
               </select>
             </div>
           </div>

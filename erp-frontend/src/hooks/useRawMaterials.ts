@@ -22,7 +22,7 @@ export function useCreateRawMaterial() {
 export function useUpdateRawMaterial() {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: ({ id, data }: { id: number; data: Partial<RawMaterial> }) => updateRawMaterial(id, data),
+    mutationFn: ({ id, data }: { id: string; data: Partial<RawMaterial> }) => updateRawMaterial(id, data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["raw-materials"] });
     },

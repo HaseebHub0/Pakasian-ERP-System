@@ -1,0 +1,33 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(.venv/Scripts/python.exe erp_system/manage.py migrate costing zero)",
+      "Bash(.venv/Scripts/python.exe erp_system/manage.py makemigrations costing)",
+      "Bash(.venv/Scripts/python.exe erp_system/manage.py migrate)",
+      "Bash(.venv/Scripts/python.exe -m pytest tests/test_costing.py -v)",
+      "Bash(\"/c/Users/Muhammad Haseeb/AppData/Local/Programs/Python/Python314/python.exe\" --version)",
+      "Bash(\"/c/Users/Muhammad Haseeb/AppData/Local/Programs/Python/Python314/python.exe\" -c \"import django; print\\(django.__version__\\)\")",
+      "Bash(python3 -c \"import django; print\\(django.__version__\\)\")",
+      "Bash(python3 -c \"import sys; print\\(sys.executable\\)\")",
+      "Read(//c/Users/Muhammad Haseeb/**)",
+      "Bash(python test_module1.py)",
+      "Bash(DJANGO_SETTINGS_MODULE=config.settings.development python3 test_module1.py)",
+      "Bash(\"/c/Users/Muhammad Haseeb/AppData/Local/Programs/Python/Python314/Scripts/pip.exe\" list)",
+      "Bash(py --list)",
+      "Bash(py -3.14 -c \"import django; print\\(django.__version__\\)\")",
+      "Bash(py -3.11 -c \"import django; print\\(django.__version__\\)\")",
+      "Bash(pip3 show:*)",
+      "Bash(pip show:*)",
+      "Bash(python3 -m pip show django)",
+      "Bash(py -3.14 -m pip install django djangorestframework)",
+      "Bash(\"/c/Users/Muhammad Haseeb/AppData/Local/Programs/Python/Python314/python.exe\" -m pip install -r erp_system/requirements/development.txt)",
+      "Bash(\"/c/Users/Muhammad Haseeb/AppData/Local/Programs/Python/Python314/python.exe\" -m pip install Django==4.2.11 djangorestframework==3.15.2 djangorestframework-simplejwt==5.3.1 django-cors-headers==4.3.1 django-filter==23.5 django-environ==0.11.2 python-decouple==3.8 pytest==8.1.1 pytest-django==4.8.0)",
+      "Bash('/c/Users/Muhammad Haseeb/AppData/Local/Programs/Python/Python314/python.exe' test_module1.py)",
+      "Bash('/c/Users/Muhammad Haseeb/AppData/Local/Programs/Python/Python314/python.exe' -m pip install celery==5.3.6 redis==5.0.3 django-celery-beat==2.6.0 django-celery-results==2.5.1 whitenoise==6.6.0 psycopg2-binary)",
+      "Bash('/c/Users/Muhammad Haseeb/AppData/Local/Programs/Python/Python314/python.exe' -m pytest tests/test_master_data.py -v)",
+      "Bash('/c/Users/Muhammad Haseeb/AppData/Local/Programs/Python/Python314/python.exe' -m pytest apps/master_data/ -v)",
+      "Bash(npx eslint:*)",
+      "Bash(npx tsc:*)"
+    ]
+  }
+}

@@ -90,13 +90,10 @@ class InventoryLedger(BaseModel):
         if self._state.adding is False:
             raise ValueError("inventory_ledger is immutable — only INSERTs allowed")
         
-        super().save(*args, **kwargs)
-
-        # Trigger logic to maintain InventorySummary natively instead of deferring to DB if using SQLite locally
         from django.db import transaction
         
         with transaction.atomic():
-            summary, created = InventorySummary.objects.get_or_create(
+            summary, created = InventorySummary.objects.select_for_update().get_or_create(
                 warehouse_id=self.warehouse_id,
                 material_id=self.material_id,
                 product_id=self.product_id,
@@ -109,8 +106,12 @@ class InventoryLedger(BaseModel):
             # Simple aggregation logic equivalent to the intended trigger
             change = self.quantity_in - self.quantity_out
             summary.total_stock += change
+            
+            # Compute balance_after
+            self.balance_after = summary.total_stock
+            
+            super().save(*args, **kwargs)
             summary.save()
-
 
     def __str__(self):
         item = self.product_id if self.item_type == 'Product' else self.material_id
@@ -214,6 +215,31 @@ class StockReservation(BaseModel):
     # created_at is strictly in BaseModel already, but we'll use BaseModel.created_at
     class Meta:
         db_table = 'stock_reservations'
+
+    def clean(self):
+        super().clean()
+        if self.reservation_status == 'Reserved' and self.reserved_quantity:
+            from apps.inventory.models import InventorySummary
+            summary = InventorySummary.objects.filter(
+                warehouse_id=self.warehouse_id_id if hasattr(self, 'warehouse_id_id') else self.warehouse_id,
+                product_id=self.product_id_id if hasattr(self, 'product_id_id') else self.product_id,
+                material_id=self.material_id_id if hasattr(self, 'material_id_id') else self.material_id,
+                batch_number=self.batch_number
+            ).first()
+            avail = summary.available_stock if summary else 0
+            
+            # If modifying an existing reservation, consider difference
+            if not self._state.adding:
+                orig = StockReservation.objects.get(pk=self.pk)
+                avail += orig.reserved_quantity
+                
+            if self.reserved_quantity > avail:
+                from django.core.exceptions import ValidationError
+                raise ValidationError("insufficient stock")
+
+    def save(self, *args, **kwargs):
+        self.full_clean()
+        super().save(*args, **kwargs)
 
 
 # ─────────────────────────────────────────────────────────────────────────────

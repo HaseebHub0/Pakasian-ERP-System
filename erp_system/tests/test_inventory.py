@@ -17,16 +17,22 @@ def api_client():
     from rest_framework.test import APIClient
     from apps.authentication.models import SystemUser
     client = APIClient()
-    user = SystemUser.objects.create(email='test@example.com', username='testuser')
+    user = SystemUser.objects.create(username='testuser')
     client.force_authenticate(user=user)
     return client
 
 @pytest.fixture
 def setup_data():
-    wh = Warehouse.objects.create(warehouse_name="Main WH", warehouse_code="WH01")
-    wh_b = Warehouse.objects.create(warehouse_name="Second WH", warehouse_code="WH02")
-    prod = Product.objects.create(product_name="Test Product", sku_code="SKU01", is_active=True)
-    mat = RawMaterial.objects.create(material_name="Test Mat", material_code="MAT01", is_active=True)
+    wh = Warehouse.objects.create(warehouse_name="Main WH", warehouse_type="Factory", city="Lahore", province="Punjab")
+    wh_b = Warehouse.objects.create(warehouse_name="Second WH", warehouse_type="Regional", city="Karachi", province="Sindh")
+    prod = Product.objects.create(
+        product_name="Test Product", sku_code="SKU01", status='active',
+        pack_size="100g", net_weight=1.0, gross_weight=1.1, barcode="123456789", shelf_life_days=90, standard_cost=100.0
+    )
+    mat = RawMaterial.objects.create(
+        material_name="Test Mat", material_code="MAT01", material_type="ingredient",
+        unit_of_measure="kg", standard_cost=50.0
+    )
     return {'wh': wh, 'wh_b': wh_b, 'prod': prod, 'mat': mat}
 
 def test_t3_1_ledger_immutable(setup_data):
@@ -128,3 +134,57 @@ def test_t3_10_expiry_auto_alert(setup_data):
     )
     result = check_expiring_batches()
     assert result['flagged'] >= 1
+
+
+def test_t3_7_transfer_creates_2_entries(setup_data, api_client):
+    from apps.inventory.models import StockTransfer, TransferItem
+    wh_a = setup_data['wh']
+    wh_b = setup_data['wh_b']
+    prod = setup_data['prod']
+
+    transfer = StockTransfer.objects.create(
+        source_warehouse=wh_a, destination_warehouse=wh_b, status='Draft'
+    )
+    item = TransferItem.objects.create(
+        transfer_id=transfer, product_id=prod, quantity=100
+    )
+
+    url_dispatch = f'/api/inventory/stock-transfers/{transfer.id}/dispatch-transfer/'
+    resp_dispatch = api_client.post(url_dispatch)
+    assert resp_dispatch.status_code == 200
+
+    url_receive = f'/api/inventory/stock-transfers/{transfer.id}/receive-transfer/'
+    resp_receive = api_client.post(url_receive)
+    assert resp_receive.status_code == 200
+
+    ledgers = InventoryLedger.objects.filter(reference_id=transfer.id, movement_type='TRANSFER')
+    assert ledgers.count() == 2
+    
+    out_ledger = ledgers.get(warehouse_id=wh_a)
+    assert out_ledger.quantity_out == 100
+    
+    in_ledger = ledgers.get(warehouse_id=wh_b)
+    assert in_ledger.quantity_in == 100
+
+
+def test_t3_9_batch_trace_returns_full_data(setup_data, api_client):
+    wh = setup_data['wh']
+    prod = setup_data['prod']
+    mat = setup_data['mat']
+    batch = BatchTable.objects.create(
+        batch_number='PN260312A', product_id=prod, status='Approved'
+    )
+    from apps.manufacturing.models import ProductionBatch, MaterialIssue
+    from apps.master_data.models import Supplier
+    
+    pb = ProductionBatch.objects.create(batch_number='PN260312A', product_id=prod, planned_quantity=1000)
+    # sup = Supplier.objects.create(supplier_name="Sup A")
+    MaterialIssue.objects.create(batch_id=pb, material_id=mat, quantity_issued=100)
+    
+    url = '/api/inventory/batches/PN260312A/trace/'
+    response = api_client.get(url)
+    assert response.status_code == 200
+    data = response.json()
+    assert data['batch_info']['batch_number'] == 'PN260312A'
+    assert len(data['raw_materials']) == 1
+    assert data['raw_materials'][0]['supplier_name'] == "Sup A"

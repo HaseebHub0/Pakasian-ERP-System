@@ -1,0 +1,17 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "Django API",
+      "runtimeExecutable": ".venv/Scripts/python.exe",
+      "runtimeArgs": ["erp_system/manage.py", "runserver", "0.0.0.0:8000"],
+      "port": 8000
+    },
+    {
+      "name": "React Frontend",
+      "runtimeExecutable": "npm",
+      "runtimeArgs": ["run", "dev", "--prefix", "erp-frontend"],
+      "port": 5173
+    }
+  ]
+}

@@ -11,14 +11,14 @@ const productSchema = z.object({
   sku_code: z.string().min(1, "SKU Code is required"),
   product_name: z.string().min(1, "Product Name is required"),
   brand: z.string().nullable().optional(),
-  category_id: z.coerce.number().nullable().optional(),
+  category_id: z.string().nullable().optional(),
   pack_size: z.string().nullable().optional(),
   net_weight: z.coerce.number().nullable().optional(),
   gross_weight: z.coerce.number().nullable().optional(),
   barcode: z.string().nullable().optional(),
   shelf_life_days: z.coerce.number().nullable().optional(),
   standard_cost: z.coerce.number().min(0, "Must be positive number"),
-  status: z.enum(["Active", "Inactive"]).default("Active"),
+  status: z.enum(["active", "inactive"]).default("active"),
 });
 
 type ProductFormValues = z.infer<typeof productSchema>;
@@ -65,7 +65,7 @@ export default function ProductsPage() {
   const updateProductMutation = useUpdateProduct();
 
   const handleToggleStatus = (product: Product) => {
-    const newStatus = product.status === "Active" ? "Inactive" : "Active";
+    const newStatus = product.status === "active" ? "inactive" : "active";
     updateProductMutation.mutate(
       { id: product.id, data: { status: newStatus } },
       {
@@ -105,8 +105,8 @@ export default function ProductsPage() {
             className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white"
           >
             <option value="">All Statuses</option>
-            <option value="Active">Active</option>
-            <option value="Inactive">Inactive</option>
+            <option value="active">Active</option>
+            <option value="inactive">Inactive</option>
           </select>
         </div>
       </div>
@@ -151,12 +151,12 @@ export default function ProductsPage() {
                     <td className="px-6 py-4 text-sm">
                       <span
                         className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
-                          product.status === "Active"
+                          product.status === "active"
                             ? "bg-green-100 text-green-800"
                             : "bg-gray-100 text-gray-800"
                         }`}
                       >
-                        {product.status}
+                        {product.status === "active" ? "Active" : "Inactive"}
                       </span>
                     </td>
                     <td className="px-6 py-4 text-sm text-gray-500">
@@ -171,11 +171,11 @@ export default function ProductsPage() {
                         <button
                           onClick={() => handleToggleStatus(product)}
                           className={`${
-                            product.status === "Active" ? "text-red-500" : "text-green-500"
+                            product.status === "active" ? "text-red-500" : "text-green-500"
                           } hover:opacity-80`}
-                          title={product.status === "Active" ? "Deactivate" : "Activate"}
+                          title={product.status === "active" ? "Deactivate" : "Activate"}
                         >
-                          {product.status === "Active" ? <ToggleRight size={20} /> : <ToggleLeft size={20} />}
+                          {product.status === "active" ? <ToggleRight size={20} /> : <ToggleLeft size={20} />}
                         </button>
                       </div>
                     </td>
@@ -261,7 +261,7 @@ function ProductModal({
       : {
           sku_code: "",
           product_name: "",
-          status: "Active",
+          status: "active" as const,
           standard_cost: 0,
         },
   });
@@ -330,7 +330,7 @@ function ProductModal({
                 <option value="">Select Category...</option>
                 {categoriesData?.results?.map((cat: any) => (
                   <option key={cat.id} value={cat.id}>
-                    {cat.name}
+                    {cat.category_name}
                   </option>
                 ))}
               </select>
@@ -398,8 +398,8 @@ function ProductModal({
                 {...register("status")}
                 className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white"
               >
-                <option value="Active">Active</option>
-                <option value="Inactive">Inactive</option>
+                <option value="active">Active</option>
+                <option value="inactive">Inactive</option>
               </select>
             </div>
           </div>

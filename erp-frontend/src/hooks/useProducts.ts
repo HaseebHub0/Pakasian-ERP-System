@@ -22,7 +22,7 @@ export function useCreateProduct() {
 export function useUpdateProduct() {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: ({ id, data }: { id: number; data: Partial<Product> }) => updateProduct(id, data),
+    mutationFn: ({ id, data }: { id: string; data: Partial<Product> }) => updateProduct(id, data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["products"] });
     },

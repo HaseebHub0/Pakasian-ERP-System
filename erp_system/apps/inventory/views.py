@@ -87,8 +87,8 @@ def batch_trace(request, batch_number):
     batch_info.update({
         'production_batch_id': str(prod_batch.id),
         'planned_quantity'   : str(prod_batch.planned_quantity),
-        'start_datetime'     : prod_batch.start_datetime.isoformat() if prod_batch.start_datetime else None,
-        'end_datetime'       : prod_batch.end_datetime.isoformat()   if prod_batch.end_datetime   else None,
+        'start_datetime'     : prod_batch.start_time.isoformat() if prod_batch.start_time else None,
+        'end_datetime'       : prod_batch.end_time.isoformat()   if prod_batch.end_time   else None,
         'production_status'  : prod_batch.status,
     })
 
@@ -96,7 +96,7 @@ def batch_trace(request, batch_number):
     raw_materials = (
         MaterialIssue.objects
         .filter(batch_id=prod_batch.id)
-        .select_related('material_id', 'supplier_id', 'issued_by')
+        .select_related('material_id', 'issued_by')
     )
 
     production_stages = (
@@ -256,9 +256,15 @@ class InventoryAdjustmentViewSet(viewsets.ModelViewSet):
     def perform_create(self, serializer):
         adj = serializer.save()
         # Auto trigger the immediate Ledger creation for the adjustment difference
-        # Assuming adj.quantity means positive=addition, negative=deduction
-        q_in = adj.quantity if adj.quantity > 0 else 0
-        q_out = abs(adj.quantity) if adj.quantity < 0 else 0
+        # Depending on type, it's either an addition or deduction
+        q_in, q_out = 0, 0
+        if adj.adjustment_type in ['Damaged', 'Shrinkage']:
+            q_out = abs(adj.quantity)
+        elif adj.adjustment_type == 'Found':
+            q_in = abs(adj.quantity)
+        else: # Correction
+            q_in = adj.quantity if adj.quantity > 0 else 0
+            q_out = abs(adj.quantity) if adj.quantity < 0 else 0
         
         InventoryLedger.objects.create(
             item_type='Product' if adj.product_id else 'Material',

@@ -7,4 +7,7 @@ urlpatterns = [
     path('api/master_data/', include('apps.master_data.urls')),
     path('api/procurement/', include('apps.procurement.urls')),
     path('api/inventory/', include('apps.inventory.urls')),
+    path('api/manufacturing/', include('apps.manufacturing.urls')),
+    path('api/costing/', include('apps.costing.urls')),
+    path('api/sales/',   include('apps.sales.urls')),
 ]
