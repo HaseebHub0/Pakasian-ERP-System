@@ -1,29 +1,35 @@
 import client from './client';
 
-export const getInventoryLedger = async (params?: Record<string, any>) => {
-  const { data } = await client.get('/api/inventory/ledger/', { params });
-  return data;
-};
+export const inventoryAPI = {
+  // Inventory Ledger
+  getLedger: async () => {
+    const response = await client.get('/api/inventory/ledger/');
+    return response.data;
+  },
 
-export const getStockSummary = async (params?: Record<string, any>) => {
-  const { data } = await client.get('/api/inventory/stock-summary/', { params });
-  return data;
-};
+  // Stock Summary
+  getSummary: async () => {
+    const response = await client.get('/api/inventory/summary/');
+    return response.data;
+  },
 
-export const getLowStockAlerts = async () => {
-  const { data } = await client.get('/api/inventory/stock-summary/', {
-    params: { below_reorder: true, page_size: 1000 },
-  });
-  const results = data?.results ?? data ?? [];
-  return { results, count: data?.count ?? results.length };
-};
+  // Stock Transfers
+  getTransfers: async () => {
+    const response = await client.get('/api/inventory/stock-transfers/');
+    return response.data;
+  },
+  createTransfer: async (data: any) => {
+    const response = await client.post('/api/inventory/stock-transfers/', data);
+    return response.data;
+  },
 
-export const getBatches = async (params?: Record<string, any>) => {
-  const { data } = await client.get('/api/inventory/batches/', { params });
-  return data;
-};
-
-export const getInventorySummary = async (params?: Record<string, any>) => {
-  const { data } = await client.get('/api/inventory/summary/', { params });
-  return data;
+  // Inventory Adjustments
+  getAdjustments: async () => {
+    const response = await client.get('/api/inventory/adjustments/');
+    return response.data;
+  },
+  createAdjustment: async (data: any) => {
+    const response = await client.post('/api/inventory/adjustments/', data);
+    return response.data;
+  }
 };

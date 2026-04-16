@@ -1,40 +1,43 @@
 import client from './client';
 
-export interface SalesOrder {
-  id: number;
-  order_number: string;
-  customer_name?: string;
-  customer?: { name: string };
-  total_amount: number;
-  order_status: string;
-  order_date: string;
-}
+export const salesAPI = {
+  // Customers
+  getCustomers: async () => {
+    const response = await client.get('/api/sales/customers/');
+    return response.data.results !== undefined ? response.data.results : response.data;
+  },
+  createCustomer: async (data: any) => {
+    const response = await client.post('/api/sales/customers/', data);
+    return response.data;
+  },
 
-export const getSalesOrders = async (params?: Record<string, any>) => {
-  const { data } = await client.get('/api/sales/orders/', { params });
-  return data;
-};
+  // Sales Orders
+  getOrders: async () => {
+    const response = await client.get('/api/sales/orders/');
+    return response.data.results !== undefined ? response.data.results : response.data;
+  },
+  createOrder: async (data: any) => {
+    const response = await client.post('/api/sales/orders/', data);
+    return response.data;
+  },
 
-export const getPendingSalesOrders = async () => {
-  const { data } = await client.get('/api/sales/orders/', {
-    params: { order_status: 'Received', page_size: 10 },
-  });
-  return data;
-};
+  // Dispatch
+  getDispatches: async () => {
+    const response = await client.get('/api/sales/dispatch/');
+    return response.data.results !== undefined ? response.data.results : response.data;
+  },
+  createDispatch: async (data: any) => {
+    const response = await client.post('/api/sales/dispatch/', data);
+    return response.data;
+  },
 
-export const getRecentSalesOrders = async (limit = 10) => {
-  const { data } = await client.get('/api/sales/orders/', {
-    params: { page_size: limit, ordering: '-order_date' },
-  });
-  return data;
-};
-
-export const getDispatches = async (params?: Record<string, any>) => {
-  const { data } = await client.get('/api/sales/dispatches/', { params });
-  return data;
-};
-
-export const getReturns = async (params?: Record<string, any>) => {
-  const { data } = await client.get('/api/sales/returns/', { params });
-  return data;
+  // Returns
+  getReturns: async () => {
+    const response = await client.get('/api/sales/returns/');
+    return response.data.results !== undefined ? response.data.results : response.data;
+  },
+  createReturn: async (data: any) => {
+    const response = await client.post('/api/sales/returns/', data);
+    return response.data;
+  }
 };

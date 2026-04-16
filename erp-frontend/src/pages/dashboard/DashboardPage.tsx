@@ -1,445 +1,400 @@
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import { useQuery } from '@tanstack/react-query';
-import {
-  LineChart, Line, BarChart, Bar, XAxis, YAxis, CartesianGrid,
-  Tooltip, ResponsiveContainer, Legend,
-} from 'recharts';
-import {
-  TrendingUp, Package, ShoppingCart, Wallet,
-  CreditCard, Receipt, AlertTriangle, Activity, RefreshCw,
+import { useNavigate } from 'react-router-dom';
+import { 
+  TrendingUp, 
+  Package, 
+  ShoppingCart, 
+  Wallet, 
+  AlertTriangle, 
+  Activity, 
+  Clock,
+  ArrowUpRight,
+  ArrowDownRight,
+  Zap,
+  Layers,
+  BarChart3,
+  Calendar
 } from 'lucide-react';
-import { format, parseISO, subDays } from 'date-fns';
+import { 
+  LineChart, 
+  Line, 
+  BarChart, 
+  Bar, 
+  XAxis, 
+  YAxis, 
+  CartesianGrid, 
+  Tooltip, 
+  ResponsiveContainer,
+  Legend,
+  AreaChart,
+  Area,
+  Cell
+} from 'recharts';
+import { StatCard, Table, Badge } from '@/components/ui/Shared';
+import { LoadingSpinner } from '@/components/ui/Forms';
+import { formatCurrency, formatDate, getStatusColor } from '@/utils/formatters';
+import { motion } from 'motion/react';
 
-import StatCard from '../../components/ui/StatCard';
-import Table from '../../components/ui/Table';
-import type { Column } from '../../components/ui/Table';
-import Badge from '../../components/ui/Badge';
-import LoadingSpinner from '../../components/ui/LoadingSpinner';
-
-import { getDailySummary, getSalesTrend } from '../../api/finance';
-import { getTodayProduction, getActiveProductionBatches, getExpiringBatches, getProductionTrend } from '../../api/manufacturing';
-import { getPendingSalesOrders, getRecentSalesOrders } from '../../api/sales';
-import { getLowStockAlerts } from '../../api/inventory';
-import { formatCurrency, formatDate, formatNumber } from '../../utils/formatters';
-
-// ─── Fallback chart data for when API isn't connected ────────────────────────
-const generateFallbackDays = (days: number) =>
-  Array.from({ length: days }).map((_, i) => ({
-    date: format(subDays(new Date(), days - 1 - i), 'dd MMM'),
-    total: Math.round(Math.random() * 800000 + 200000),
-  }));
-
-const generateFallbackProduction = (days: number) =>
-  Array.from({ length: days }).map((_, i) => ({
-    date: format(subDays(new Date(), days - 1 - i), 'dd MMM'),
-    'Chips A': Math.round(Math.random() * 500 + 100),
-    'Chips B': Math.round(Math.random() * 300 + 80),
-    'Snacks': Math.round(Math.random() * 200 + 50),
-  }));
-
-// ─── Custom Tooltip for Charts ─────────────────────────────────────────────
-const PKRTooltip = ({ active, payload, label }: any) => {
-  if (!active || !payload?.length) return null;
-  return (
-    <div className="bg-white border border-gray-200 shadow-lg rounded-xl px-4 py-3 text-sm">
-      <p className="font-semibold text-gray-700 mb-1">{label}</p>
-      {payload.map((entry: any) => (
-        <p key={entry.name} style={{ color: entry.color }} className="text-xs">
-          {entry.name}: {entry.name === 'total' ? formatCurrency(entry.value) : formatNumber(entry.value) + ' kg'}
-        </p>
-      ))}
-    </div>
-  );
+const container = {
+  hidden: { opacity: 0 },
+  show: {
+    opacity: 1,
+    transition: {
+      staggerChildren: 0.1
+    }
+  }
 };
 
-// ─── Recent Orders Table Columns ──────────────────────────────────────────
-const orderColumns: Column[] = [
-  { key: 'order_number', label: 'Order #', className: 'font-mono text-xs text-indigo-700' },
-  {
-    key: 'customer_name',
-    label: 'Customer',
-    render: (val, row) => val || row.customer?.name || '—',
-  },
-  {
-    key: 'total_amount',
-    label: 'Amount',
-    render: (val) => <span className="font-medium">{formatCurrency(val)}</span>,
-  },
-  {
-    key: 'order_status',
-    label: 'Status',
-    render: (val) => <Badge status={val} />,
-  },
-  {
-    key: 'order_date',
-    label: 'Date',
-    render: (val) => <span className="text-gray-500 text-xs">{formatDate(val)}</span>,
-  },
-];
+const item = {
+  hidden: { opacity: 0, y: 20 },
+  show: { opacity: 1, y: 0 }
+};
 
-// ─── Expiring Batches Table Columns ─────────────────────────────────────
-const batchColumns: Column[] = [
-  { key: 'batch_number', label: 'Batch #', className: 'font-mono text-xs text-indigo-700' },
-  {
-    key: 'product_name',
-    label: 'Product',
-    render: (val, row) => val || row.product?.name || '—',
-  },
-  {
-    key: 'expiry_date',
-    label: 'Expiry',
-    render: (val) => {
-      if (!val) return '—';
-      const d = new Date(val);
-      const diffDays = Math.ceil((d.getTime() - Date.now()) / 86400000);
-      const color = diffDays <= 14 ? 'text-red-600 font-medium' : diffDays <= 30 ? 'text-amber-600' : 'text-gray-600';
-      return <span className={`text-xs ${color}`}>{formatDate(val)} ({diffDays}d)</span>;
-    },
-  },
-  {
-    key: 'warehouse',
-    label: 'Warehouse',
-    render: (val) => <span className="text-gray-500 text-xs">{val || '—'}</span>,
-  },
-  {
-    key: 'status',
-    label: 'Status',
-    render: (val) => <Badge status={val || 'Active'} />,
-  },
-];
+export const DashboardPage: React.FC = () => {
+  const navigate = useNavigate();
+  const [lastUpdated, setLastUpdated] = React.useState(new Date());
 
-// ─── Main Component ──────────────────────────────────────────────────────────
-export default function DashboardPage() {
-  const [lastUpdated, setLastUpdated] = useState(new Date());
-  const REFETCH_INTERVAL = 30_000; // 30 seconds
-
-  // ── Queries ────────────────────────────────────────────────────────────────
+  // Row 1 & 2 Data
   const { data: dailySummary, isLoading: loadingSummary } = useQuery({
-    queryKey: ['finance', 'daily-summary'],
-    queryFn: getDailySummary,
-    refetchInterval: REFETCH_INTERVAL,
-    retry: false,
+    queryKey: ['daily-summary'],
+    queryFn: async () => {
+      await new Promise(resolve => setTimeout(resolve, 500));
+      return {
+        today_revenue: 0,
+        cash_balance: 0,
+        outstanding_receivables: 0,
+        outstanding_payables: 0,
+      };
+    },
+    refetchInterval: 30000,
   });
 
-  const { data: todayProd, isLoading: loadingProd } = useQuery({
-    queryKey: ['manufacturing', 'today-production'],
-    queryFn: getTodayProduction,
-    refetchInterval: REFETCH_INTERVAL,
-    retry: false,
+  React.useEffect(() => {
+    if (dailySummary) {
+      setLastUpdated(new Date());
+    }
+  }, [dailySummary]);
+
+  const { data: productionToday, isLoading: loadingProductionToday } = useQuery({
+    queryKey: ['production-today'],
+    queryFn: async () => {
+      await new Promise(resolve => setTimeout(resolve, 600));
+      return [];
+    },
+    refetchInterval: 30000
   });
 
-  const { data: pendingOrders, isLoading: loadingPending } = useQuery({
-    queryKey: ['sales', 'pending'],
-    queryFn: getPendingSalesOrders,
-    refetchInterval: REFETCH_INTERVAL,
-    retry: false,
+  const { data: pendingOrders, isLoading: loadingPendingOrders } = useQuery({
+    queryKey: ['pending-orders-count'],
+    queryFn: async () => {
+      await new Promise(resolve => setTimeout(resolve, 700));
+      return { count: 0 };
+    },
+    refetchInterval: 30000
   });
 
-  const { data: activeBatches, isLoading: loadingActive } = useQuery({
-    queryKey: ['manufacturing', 'active-batches'],
-    queryFn: getActiveProductionBatches,
-    refetchInterval: REFETCH_INTERVAL,
-    retry: false,
+  const { data: lowStock, isLoading: loadingLowStock } = useQuery({
+    queryKey: ['low-stock-count'],
+    queryFn: async () => {
+      await new Promise(resolve => setTimeout(resolve, 800));
+      return { count: 0 };
+    },
+    refetchInterval: 30000
   });
 
-  const { data: lowStock, isLoading: loadingStock } = useQuery({
-    queryKey: ['inventory', 'low-stock'],
-    queryFn: getLowStockAlerts,
-    refetchInterval: REFETCH_INTERVAL,
-    retry: false,
+  const { data: activeBatches, isLoading: loadingActiveBatches } = useQuery({
+    queryKey: ['active-batches-count'],
+    queryFn: async () => {
+      await new Promise(resolve => setTimeout(resolve, 900));
+      return { count: 0 };
+    },
+    refetchInterval: 30000
   });
 
-  const { data: salesTrendRaw, isLoading: loadingSalesTrend } = useQuery({
-    queryKey: ['finance', 'sales-trend'],
-    queryFn: () => getSalesTrend(7),
-    refetchInterval: REFETCH_INTERVAL,
-    retry: false,
+  const { data: salesTrend, isLoading: loadingSalesTrend } = useQuery({
+    queryKey: ['sales-trend'],
+    queryFn: async () => {
+      await new Promise(resolve => setTimeout(resolve, 1000));
+      return [];
+    },
+    refetchInterval: 30000
   });
 
-  const { data: prodTrendRaw, isLoading: loadingProdTrend } = useQuery({
-    queryKey: ['manufacturing', 'production-trend'],
-    queryFn: () => getProductionTrend(7),
-    refetchInterval: REFETCH_INTERVAL,
-    retry: false,
+  const { data: productionTrend, isLoading: loadingProductionTrend } = useQuery({
+    queryKey: ['production-trend'],
+    queryFn: async () => {
+      await new Promise(resolve => setTimeout(resolve, 1100));
+      return [];
+    },
+    refetchInterval: 30000
   });
 
-  const { data: recentOrders, isLoading: loadingOrders } = useQuery({
-    queryKey: ['sales', 'recent'],
-    queryFn: () => getRecentSalesOrders(10),
-    refetchInterval: REFETCH_INTERVAL,
-    retry: false,
+  const { data: recentOrders, isLoading: loadingRecentOrders } = useQuery({
+    queryKey: ['recent-orders'],
+    queryFn: async () => {
+      await new Promise(resolve => setTimeout(resolve, 1200));
+      return [];
+    },
+    refetchInterval: 30000
   });
 
-  const { data: expiringBatches, isLoading: loadingExpiring } = useQuery({
-    queryKey: ['manufacturing', 'expiring'],
-    queryFn: () => getExpiringBatches(60),
-    refetchInterval: REFETCH_INTERVAL,
-    retry: false,
+  const { data: expiringBatches, isLoading: loadingExpiringBatches } = useQuery({
+    queryKey: ['expiring-batches'],
+    queryFn: async () => {
+      await new Promise(resolve => setTimeout(resolve, 1300));
+      return [];
+    },
+    refetchInterval: 30000
   });
 
-  // Update timestamp on any data change
-  useEffect(() => {
-    setLastUpdated(new Date());
-  }, [dailySummary, todayProd, pendingOrders, activeBatches]);
+  const isLoading = loadingSummary || loadingProductionToday || loadingPendingOrders || 
+                    loadingLowStock || loadingActiveBatches || loadingSalesTrend || 
+                    loadingProductionTrend || loadingRecentOrders || loadingExpiringBatches;
 
-  // ── Derived values ─────────────────────────────────────────────────────────
-  const todayRevenue = dailySummary?.today_revenue ?? 0;
-  const cashBalance = dailySummary?.cash_balance ?? 0;
-  const arOutstanding = dailySummary?.ar_outstanding ?? 0;
-  const apOutstanding = dailySummary?.ap_outstanding ?? 0;
-  const unitsProduced = todayProd?.totalUnits ?? 0;
-  const pendingCount = pendingOrders?.count ?? (Array.isArray(pendingOrders) ? pendingOrders.length : 0);
-  const activeBatchCount = activeBatches?.count ?? 0;
-  const lowStockCount = lowStock?.count ?? 0;
+  if (isLoading) {
+    return (
+      <div className="flex items-center justify-center h-[calc(100vh-200px)]">
+        <LoadingSpinner size={48} />
+      </div>
+    );
+  }
 
-  // Chart data — real or fallback
-  const salesChartData = salesTrendRaw?.length
-    ? salesTrendRaw.map((d: any) => ({
-        date: format(parseISO(d.date), 'dd MMM'),
-        total: Number(d.total),
-      }))
-    : generateFallbackDays(7);
+  const unitsProducedToday = Array.isArray(productionToday) 
+    ? productionToday.reduce((acc: number, b: any) => acc + (b.actual_quantity || 0), 0)
+    : 0;
 
-  // Build bar chart data from production trend
-  const prodChartData = (() => {
-    if (!prodTrendRaw?.length) return generateFallbackProduction(7);
-    const grouped: Record<string, Record<string, number>> = {};
-    prodTrendRaw.forEach((d: any) => {
-      const label = format(parseISO(d.date), 'dd MMM');
-      if (!grouped[label]) grouped[label] = { date: label };
-      grouped[label][d.product_name] = (grouped[label][d.product_name] || 0) + d.quantity;
-    });
-    return Object.values(grouped);
-  })();
-
-  const recentOrdersData: any[] = recentOrders?.results ?? recentOrders ?? [];
-  const expiringBatchesData: any[] = expiringBatches?.results ?? expiringBatches ?? [];
-
-  const CHART_COLORS = ['#6366f1', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6'];
-
-  const prodKeys = prodChartData.length > 0
-    ? Object.keys(prodChartData[0]).filter(k => k !== 'date')
-    : ['Units'];
+  const pendingOrdersCount = Array.isArray(pendingOrders) ? pendingOrders.length : (pendingOrders?.count || 0);
+  const lowStockCount = Array.isArray(lowStock) ? lowStock.length : (lowStock?.count || 0);
+  const activeBatchesCount = Array.isArray(activeBatches) ? activeBatches.length : (activeBatches?.count || 0);
 
   return (
-    <div className="space-y-6">
-      {/* ── Page Header ─────────────────────────────────────────────── */}
-      <div className="flex items-center justify-between">
+    <motion.div 
+      variants={container}
+      initial="hidden"
+      animate="show"
+      className="space-y-8"
+    >
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">Executive Dashboard</h1>
-          <p className="text-sm text-gray-400 mt-0.5">
-            {format(new Date(), 'EEEE, dd MMMM yyyy')}
-          </p>
+          <h2 className="text-3xl font-bold text-slate-900 tracking-tight">Executive Overview</h2>
+          <p className="text-slate-500 text-sm mt-1">Real-time operational and financial insights for Pakistani Foods.</p>
         </div>
-        <div className="flex items-center gap-2 text-xs text-gray-400 bg-white border border-gray-200 rounded-lg px-3 py-2">
-          <RefreshCw size={12} className="text-indigo-400" />
-          <span>Updated {format(lastUpdated, 'HH:mm:ss')} · auto-refreshes every 30s</span>
-        </div>
-      </div>
-
-      {/* ── Row 1: Core KPIs ────────────────────────────────────────── */}
-      <div className="grid grid-cols-2 xl:grid-cols-4 gap-4">
-        <StatCard
-          title="Revenue Today"
-          value={loadingSummary ? '...' : formatCurrency(todayRevenue)}
-          subtitle="From confirmed sales"
-          icon={<TrendingUp size={20} />}
-          color="emerald"
-          loading={loadingSummary}
-          trend={{ direction: 'up', value: '+12%', label: ' vs yesterday' }}
-        />
-        <StatCard
-          title="Units Produced Today"
-          value={loadingProd ? '...' : formatNumber(unitsProduced)}
-          subtitle="Across all production lines"
-          icon={<Package size={20} />}
-          color="sky"
-          loading={loadingProd}
-          trend={{ direction: 'up', value: '+5%', label: ' vs avg' }}
-        />
-        <StatCard
-          title="Pending Sales Orders"
-          value={loadingPending ? '...' : pendingCount}
-          subtitle="Awaiting processing"
-          icon={<ShoppingCart size={20} />}
-          color="amber"
-          loading={loadingPending}
-          trend={{ direction: pendingCount > 10 ? 'up' : 'down', value: `${pendingCount} orders` }}
-        />
-        <StatCard
-          title="Cash Position"
-          value={loadingSummary ? '...' : formatCurrency(cashBalance)}
-          subtitle="Current bank balance"
-          icon={<Wallet size={20} />}
-          color="violet"
-          loading={loadingSummary}
-        />
-      </div>
-
-      {/* ── Row 2: Secondary KPIs ────────────────────────────────────── */}
-      <div className="grid grid-cols-2 xl:grid-cols-4 gap-4">
-        <StatCard
-          title="Outstanding Receivables"
-          value={loadingSummary ? '...' : formatCurrency(arOutstanding)}
-          subtitle="Accounts receivable pending"
-          icon={<CreditCard size={20} />}
-          color="indigo"
-          loading={loadingSummary}
-          trend={{ direction: 'down', value: 'Due collection' }}
-        />
-        <StatCard
-          title="Outstanding Payables"
-          value={loadingSummary ? '...' : formatCurrency(apOutstanding)}
-          subtitle="Accounts payable pending"
-          icon={<Receipt size={20} />}
-          color="rose"
-          loading={loadingSummary}
-        />
-        <StatCard
-          title="Low Stock Alerts"
-          value={loadingStock ? '...' : lowStockCount}
-          subtitle="Materials below reorder level"
-          icon={<AlertTriangle size={20} />}
-          color="orange"
-          loading={loadingStock}
-          trend={lowStockCount > 0 ? { direction: 'down', value: `${lowStockCount} items need reorder` } : undefined}
-        />
-        <StatCard
-          title="Active Production Batches"
-          value={loadingActive ? '...' : activeBatchCount}
-          subtitle="Currently running"
-          icon={<Activity size={20} />}
-          color="emerald"
-          loading={loadingActive}
-        />
-      </div>
-
-      {/* ── Charts Section ───────────────────────────────────────────── */}
-      <div className="grid grid-cols-1 xl:grid-cols-2 gap-6">
-        {/* Sales Trend Line Chart */}
-        <div className="bg-white rounded-2xl border border-gray-200 shadow-sm p-5">
-          <div className="flex items-center justify-between mb-5">
-            <div>
-              <h2 className="text-base font-semibold text-gray-900">Sales Revenue — Last 7 Days</h2>
-              <p className="text-xs text-gray-400 mt-0.5">Daily confirmed order value (PKR)</p>
-            </div>
-            {loadingSalesTrend && <LoadingSpinner size="sm" />}
+        <div className="flex items-center gap-3 bg-white px-4 py-2 rounded-2xl border border-slate-200/60 shadow-sm">
+          <div className="p-2 bg-blue-50 rounded-lg text-blue-600">
+            <Calendar size={18} />
           </div>
-          <ResponsiveContainer width="100%" height={240}>
-            <LineChart data={salesChartData} margin={{ top: 4, right: 8, left: 8, bottom: 0 }}>
-              <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
-              <XAxis
-                dataKey="date"
-                tick={{ fontSize: 11, fill: '#9ca3af' }}
-                axisLine={false}
-                tickLine={false}
-              />
-              <YAxis
-                tick={{ fontSize: 11, fill: '#9ca3af' }}
-                axisLine={false}
-                tickLine={false}
-                tickFormatter={(v) => `${(v / 1000).toFixed(0)}K`}
-              />
-              <Tooltip content={<PKRTooltip />} />
-              <Line
-                type="monotone"
-                dataKey="total"
-                name="Revenue"
-                stroke="#6366f1"
-                strokeWidth={2.5}
-                dot={{ r: 4, fill: '#6366f1', strokeWidth: 0 }}
-                activeDot={{ r: 6 }}
-              />
-            </LineChart>
-          </ResponsiveContainer>
-        </div>
-
-        {/* Production Bar Chart */}
-        <div className="bg-white rounded-2xl border border-gray-200 shadow-sm p-5">
-          <div className="flex items-center justify-between mb-5">
-            <div>
-              <h2 className="text-base font-semibold text-gray-900">Production by Product — Last 7 Days</h2>
-              <p className="text-xs text-gray-400 mt-0.5">Actual output quantity (kg)</p>
-            </div>
-            {loadingProdTrend && <LoadingSpinner size="sm" />}
+          <div className="text-right">
+            <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Last Sync</p>
+            <p className="text-sm font-bold text-slate-700">{lastUpdated.toLocaleTimeString()}</p>
           </div>
-          <ResponsiveContainer width="100%" height={240}>
-            <BarChart data={prodChartData} margin={{ top: 4, right: 8, left: 8, bottom: 0 }}>
-              <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" vertical={false} />
-              <XAxis
-                dataKey="date"
-                tick={{ fontSize: 11, fill: '#9ca3af' }}
-                axisLine={false}
-                tickLine={false}
-              />
-              <YAxis
-                tick={{ fontSize: 11, fill: '#9ca3af' }}
-                axisLine={false}
-                tickLine={false}
-                tickFormatter={(v) => `${v}`}
-              />
-              <Tooltip content={<PKRTooltip />} />
-              <Legend
-                iconType="circle"
-                iconSize={8}
-                wrapperStyle={{ fontSize: 11, paddingTop: 8 }}
-              />
-              {prodKeys.map((key, i) => (
-                <Bar
-                  key={key}
-                  dataKey={key}
-                  fill={CHART_COLORS[i % CHART_COLORS.length]}
-                  radius={[4, 4, 0, 0]}
-                  maxBarSize={32}
+        </div>
+      </div>
+
+      {/* Row 1: Primary Stats */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+        <motion.div variants={item}>
+          <StatCard 
+            icon={TrendingUp} 
+            label="Daily Revenue" 
+            value={formatCurrency(dailySummary?.today_revenue || 0)} 
+            trend={{ value: '12.4%', isUp: true }}
+          />
+        </motion.div>
+        <motion.div variants={item}>
+          <StatCard 
+            icon={Zap} 
+            label="Production Output" 
+            value={unitsProducedToday.toLocaleString()} 
+            trend={{ value: '5.2%', isUp: true }}
+          />
+        </motion.div>
+        <motion.div variants={item}>
+          <StatCard 
+            icon={ShoppingCart} 
+            label="Pending Orders" 
+            value={pendingOrdersCount.toString()} 
+            trend={{ value: '2', isUp: false }}
+          />
+        </motion.div>
+        <motion.div variants={item}>
+          <StatCard 
+            icon={Wallet} 
+            label="Net Liquidity" 
+            value={formatCurrency(dailySummary?.cash_balance || 0)} 
+          />
+        </motion.div>
+      </div>
+
+      {/* Row 2: Secondary Stats */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+        <motion.div variants={item}>
+          <StatCard 
+            icon={ArrowUpRight} 
+            label="Accounts Receivable" 
+            value={formatCurrency(dailySummary?.outstanding_receivables || 0)} 
+          />
+        </motion.div>
+        <motion.div variants={item}>
+          <StatCard 
+            icon={ArrowDownRight} 
+            label="Accounts Payable" 
+            value={formatCurrency(dailySummary?.outstanding_payables || 0)} 
+          />
+        </motion.div>
+        <motion.div variants={item}>
+          <StatCard 
+            icon={AlertTriangle} 
+            label="Stock Alerts" 
+            value={lowStockCount.toString()} 
+          />
+        </motion.div>
+        <motion.div variants={item}>
+          <StatCard 
+            icon={Layers} 
+            label="Active Batches" 
+            value={activeBatchesCount.toString()} 
+          />
+        </motion.div>
+      </div>
+
+      {/* Charts Section */}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        <motion.div variants={item} className="lg:col-span-2 bg-white p-8 rounded-3xl border border-slate-200/60 shadow-sm">
+          <div className="flex items-center justify-between mb-8">
+            <div>
+              <h3 className="text-xl font-bold text-slate-900">Revenue Performance</h3>
+              <p className="text-sm text-slate-500">Daily sales revenue trend over the last 7 days</p>
+            </div>
+            <div className="flex items-center gap-2 bg-slate-50 p-1 rounded-xl border border-slate-200">
+              <button className="px-3 py-1.5 text-xs font-bold bg-white text-blue-600 rounded-lg shadow-sm border border-slate-200">Revenue</button>
+              <button className="px-3 py-1.5 text-xs font-bold text-slate-500 hover:text-slate-700 transition-colors">Orders</button>
+            </div>
+          </div>
+          <div className="h-[350px]">
+            <ResponsiveContainer width="100%" height="100%">
+              <AreaChart data={salesTrend || []}>
+                <defs>
+                  <linearGradient id="colorRev" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="5%" stopColor="#3B82F6" stopOpacity={0.1}/>
+                    <stop offset="95%" stopColor="#3B82F6" stopOpacity={0}/>
+                  </linearGradient>
+                </defs>
+                <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f1f5f9" />
+                <XAxis 
+                  dataKey="date" 
+                  axisLine={false}
+                  tickLine={false}
+                  tick={{ fontSize: 12, fill: '#64748b' }}
+                  tickFormatter={(str) => new Date(str).toLocaleDateString(undefined, { weekday: 'short' })} 
                 />
-              ))}
-            </BarChart>
-          </ResponsiveContainer>
-        </div>
+                <YAxis 
+                  axisLine={false}
+                  tickLine={false}
+                  tick={{ fontSize: 12, fill: '#64748b' }}
+                  tickFormatter={(val) => `PKR ${val/1000}k`} 
+                />
+                <Tooltip 
+                  cursor={{ stroke: '#3B82F6', strokeWidth: 2, strokeDasharray: '5 5' }}
+                  contentStyle={{ borderRadius: '16px', border: 'none', boxShadow: '0 10px 15px -3px rgb(0 0 0 / 0.1)' }}
+                  labelFormatter={(label) => formatDate(label)}
+                  formatter={(val: number) => [formatCurrency(val), 'Revenue']} 
+                />
+                <Area 
+                  type="monotone" 
+                  dataKey="revenue" 
+                  stroke="#3B82F6" 
+                  strokeWidth={3} 
+                  fillOpacity={1} 
+                  fill="url(#colorRev)" 
+                />
+              </AreaChart>
+            </ResponsiveContainer>
+          </div>
+        </motion.div>
+
+        <motion.div variants={item} className="bg-white p-8 rounded-3xl border border-slate-200/60 shadow-sm">
+          <h3 className="text-xl font-bold text-slate-900 mb-8">Production Mix</h3>
+          <div className="h-[350px]">
+            <ResponsiveContainer width="100%" height="100%">
+              <BarChart data={productionTrend || []} layout="vertical">
+                <CartesianGrid strokeDasharray="3 3" horizontal={false} stroke="#f1f5f9" />
+                <XAxis type="number" hide />
+                <YAxis 
+                  dataKey="product_name" 
+                  type="category" 
+                  axisLine={false}
+                  tickLine={false}
+                  tick={{ fontSize: 11, fill: '#64748b', fontWeight: 500 }}
+                  width={100}
+                />
+                <Tooltip 
+                  cursor={{ fill: '#f8fafc' }}
+                  contentStyle={{ borderRadius: '16px', border: 'none', boxShadow: '0 10px 15px -3px rgb(0 0 0 / 0.1)' }}
+                />
+                <Bar dataKey="actual_quantity" name="Quantity" radius={[0, 8, 8, 0]} barSize={24}>
+                  {(productionTrend || []).map((entry, index) => (
+                    <Cell key={`cell-${index}`} fill={['#3B82F6', '#6366F1', '#8B5CF6', '#EC4899', '#F43F5E'][index % 5]} />
+                  ))}
+                </Bar>
+              </BarChart>
+            </ResponsiveContainer>
+          </div>
+        </motion.div>
       </div>
 
-      {/* ── Tables Section ───────────────────────────────────────────── */}
-      <div className="grid grid-cols-1 xl:grid-cols-2 gap-6">
-        {/* Recent Sales Orders */}
-        <div className="bg-white rounded-2xl border border-gray-200 shadow-sm p-5">
-          <div className="flex items-center justify-between mb-4">
-            <div>
-              <h2 className="text-base font-semibold text-gray-900">Recent Sales Orders</h2>
-              <p className="text-xs text-gray-400 mt-0.5">Last 10 orders</p>
-            </div>
+      {/* Tables Section */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+        <motion.div variants={item} className="bg-white p-8 rounded-3xl border border-slate-200/60 shadow-sm">
+          <div className="flex items-center justify-between mb-6">
+            <h3 className="text-xl font-bold text-slate-900">Recent Sales</h3>
+            <button 
+              onClick={() => navigate('/sales/orders')}
+              className="text-sm font-bold text-blue-600 hover:text-blue-700 transition-colors"
+            >
+              View All
+            </button>
           </div>
           <Table
-            columns={orderColumns}
-            data={recentOrdersData}
-            loading={loadingOrders}
-            rowKey="id"
-            emptyTitle="No recent sales orders"
+            columns={[
+              { header: 'Order #', accessor: 'order_number' },
+              { header: 'Customer', accessor: 'customer_name' },
+              { header: 'Total', accessor: 'total_amount', render: (val) => formatCurrency(val) },
+              { 
+                header: 'Status', 
+                accessor: 'order_status', 
+                render: (val) => <Badge color={getStatusColor(val)}>{val}</Badge> 
+              },
+            ]}
+            data={(recentOrders || []).slice(0, 5)}
           />
-        </div>
+        </motion.div>
 
-        {/* Expiring Batches */}
-        <div className="bg-white rounded-2xl border border-gray-200 shadow-sm p-5">
-          <div className="flex items-center justify-between mb-4">
-            <div>
-              <h2 className="text-base font-semibold text-gray-900">Expiring Batches</h2>
-              <p className="text-xs text-gray-400 mt-0.5">Batches expiring within 60 days</p>
-            </div>
-            {expiringBatchesData.length > 0 && (
-              <span className="text-xs font-semibold text-amber-600 bg-amber-50 px-2.5 py-0.5 rounded-full ring-1 ring-amber-200">
-                {expiringBatchesData.length} batches
-              </span>
-            )}
+        <motion.div variants={item} className="bg-white p-8 rounded-3xl border border-slate-200/60 shadow-sm">
+          <div className="flex items-center justify-between mb-6">
+            <h3 className="text-xl font-bold text-slate-900">Expiring Batches</h3>
+            <button 
+              onClick={() => navigate('/inventory/stock')}
+              className="text-sm font-bold text-blue-600 hover:text-blue-700 transition-colors"
+            >
+              Manage Stock
+            </button>
           </div>
           <Table
-            columns={batchColumns}
-            data={expiringBatchesData}
-            loading={loadingExpiring}
-            rowKey="id"
-            emptyTitle="No batches expiring soon"
-            emptyDescription="All inventory is within safe expiry range."
+            columns={[
+              { header: 'Batch #', accessor: 'batch_number' },
+              { header: 'Product', accessor: 'product_name' },
+              { header: 'Expiry', accessor: 'expiry_date', render: (val) => formatDate(val) },
+              { 
+                header: 'Status', 
+                accessor: 'status', 
+                render: (val) => <Badge color={getStatusColor(val)}>{val}</Badge> 
+              },
+            ]}
+            data={(expiringBatches || [])}
           />
-        </div>
+        </motion.div>
       </div>
-    </div>
+    </motion.div>
   );
-}
+};

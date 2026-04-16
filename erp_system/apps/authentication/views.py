@@ -20,7 +20,7 @@ class LoginView(APIView):
             password = serializer.validated_data['password']
 
             try:
-                user = SystemUser.objects.get(username=username)
+                user = SystemUser.objects.get(username__iexact=username)
             except SystemUser.DoesNotExist:
                 return Response({'error': 'Invalid credentials'}, status=status.HTTP_401_UNAUTHORIZED)
                 

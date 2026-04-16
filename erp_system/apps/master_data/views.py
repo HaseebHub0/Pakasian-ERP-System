@@ -99,13 +99,18 @@ class RawMaterialViewSet(viewsets.ModelViewSet):
     queryset = RawMaterial.objects.all()
     serializer_class = RawMaterialSerializer
     permission_classes = [IsAuthenticated]
-    filterset_fields = ['material_type']
+    filterset_fields = ['material_type', 'status']
+    search_fields = ['material_name', 'material_code']
 
     def destroy(self, request, *args, **kwargs):
-        """Hard delete — raw materials can be removed if not referenced."""
+        """Soft delete — set status=inactive instead of removing the row."""
         instance = self.get_object()
-        instance.delete()
-        return Response(status=status.HTTP_204_NO_CONTENT)
+        instance.status = 'inactive'
+        instance.save(update_fields=['status', 'updated_at'])
+        return Response(
+            {'message': f"Raw material '{instance.material_code}' deactivated."},
+            status=status.HTTP_200_OK,
+        )
 
     @action(detail=False, methods=['get'], url_path='low_stock')
     def low_stock(self, request):
@@ -148,12 +153,18 @@ class SupplierViewSet(viewsets.ModelViewSet):
     queryset = Supplier.objects.all()
     serializer_class = SupplierSerializer
     permission_classes = [IsAuthenticated]
-    filterset_fields = ['currency', 'payment_terms']
+    filterset_fields = ['currency', 'payment_terms', 'status']
+    search_fields = ['supplier_name', 'contact_person', 'email', 'phone']
 
     def destroy(self, request, *args, **kwargs):
+        """Soft delete — deactivate rather than wipe supplier records."""
         instance = self.get_object()
-        instance.delete()
-        return Response(status=status.HTTP_204_NO_CONTENT)
+        instance.status = 'inactive'
+        instance.save(update_fields=['status', 'updated_at'])
+        return Response(
+            {'message': f"Supplier '{instance.supplier_name}' deactivated."},
+            status=status.HTTP_200_OK,
+        )
 
 
 class WarehouseViewSet(viewsets.ModelViewSet):
@@ -161,6 +172,7 @@ class WarehouseViewSet(viewsets.ModelViewSet):
     serializer_class = WarehouseSerializer
     permission_classes = [IsAuthenticated]
     filterset_fields = ['status', 'warehouse_type', 'city', 'province']
+    search_fields = ['warehouse_name', 'city', 'province']
 
     def destroy(self, request, *args, **kwargs):
         """Soft delete — deactivate rather than wipe warehouse records."""

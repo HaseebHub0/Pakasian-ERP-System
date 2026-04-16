@@ -73,16 +73,21 @@ class RawMaterial(BaseModel):
         ('packaging',  'Packaging'),
         ('additive',   'Additive'),
     ]
+    STATUS_CHOICES = [('active', 'Active'), ('inactive', 'Inactive')]
 
     material_code    = models.CharField(max_length=100, unique=True, db_column='material_code')
     material_name    = models.CharField(max_length=255, db_column='material_name')
-    material_type    = models.CharField(max_length=50, choices=MATERIAL_TYPE_CHOICES, db_column='material_type')
+    material_type    = models.CharField(max_length=50, db_column='material_type')
     unit_of_measure  = models.CharField(max_length=50, db_column='unit_of_measure')
     density          = models.DecimalField(max_digits=10, decimal_places=4, null=True, blank=True, db_column='density')
     standard_cost    = models.DecimalField(max_digits=14, decimal_places=4, db_column='standard_cost')
     safety_stock     = models.DecimalField(max_digits=14, decimal_places=4, default=0, db_column='safety_stock')
     reorder_level    = models.DecimalField(max_digits=14, decimal_places=4, default=0, db_column='reorder_level')
+    current_stock    = models.DecimalField(max_digits=14, decimal_places=4, default=0, db_column='current_stock')
     shelf_life_days  = models.IntegerField(null=True, blank=True, db_column='shelf_life_days')
+    status           = models.CharField(
+        max_length=20, choices=STATUS_CHOICES, default='active', db_column='status'
+    )
 
     class Meta:
         db_table = 'raw_materials'
@@ -99,11 +104,14 @@ class Supplier(BaseModel):
         ('COD',     'Cash on Delivery'),
         ('ADVANCE', 'Advance Payment'),
     ]
+    STATUS_CHOICES = [('active', 'Active'), ('inactive', 'Inactive')]
 
     supplier_name   = models.CharField(max_length=255, db_column='supplier_name')
     contact_person  = models.CharField(max_length=150, blank=True, default='', db_column='contact_person')
     phone           = models.CharField(max_length=50, blank=True, default='', db_column='phone')
     email           = models.EmailField(blank=True, default='', db_column='email')
+    city            = models.CharField(max_length=100, blank=True, default='', db_column='city')
+    address         = models.TextField(blank=True, default='', db_column='address')
     payment_terms   = models.CharField(
         max_length=50, blank=True, default='NET30',
         choices=PAYMENT_TERMS_CHOICES,
@@ -115,6 +123,15 @@ class Supplier(BaseModel):
         null=True, blank=True,
         validators=[MinValueValidator(1), MaxValueValidator(5)],
         db_column='rating',
+    )
+    status          = models.CharField(
+        max_length=20, choices=STATUS_CHOICES, default='active', db_column='status'
+    )
+    supplied_materials = models.ManyToManyField(
+        'RawMaterial',
+        related_name='suppliers',
+        blank=True,
+        db_table='supplier_materials_mapping'
     )
 
     class Meta:
@@ -196,8 +213,15 @@ class ProductionLine(BaseModel):
     ]
 
     line_name        = models.CharField(max_length=255, db_column='line_name')
-    factory_id       = models.UUIDField(db_column='factory_id', help_text='UUID of the Factory warehouse this line belongs to')
-    line_type        = models.CharField(max_length=50, choices=LINE_TYPE_CHOICES, db_column='line_type')
+    factory          = models.ForeignKey(
+        'Warehouse', 
+        on_delete=models.SET_NULL, 
+        null=True, blank=True, 
+        db_column='factory_id',
+        related_name='production_lines',
+        help_text='The Factory warehouse this line belongs to'
+    )
+    line_type        = models.CharField(max_length=255, db_column='line_type', help_text='Comma separated processes or main type')
     capacity_per_hour = models.DecimalField(max_digits=10, decimal_places=3, db_column='capacity_per_hour')
     status           = models.CharField(max_length=20, choices=STATUS_CHOICES, default='active', db_column='status')
 
@@ -226,6 +250,9 @@ class Machine(BaseModel):
         related_name='machines',
     )
     capacity_per_hour  = models.DecimalField(max_digits=10, decimal_places=3, null=True, blank=True, db_column='capacity_per_hour')
+    cost_per_hour      = models.DecimalField(max_digits=10, decimal_places=2, default=0.00, db_column='cost_per_hour')
+    maintenance_cost   = models.DecimalField(max_digits=10, decimal_places=2, default=0.00, db_column='maintenance_cost')
+    depreciation       = models.DecimalField(max_digits=10, decimal_places=2, default=0.00, db_column='depreciation')
     status             = models.CharField(max_length=20, choices=STATUS_CHOICES, default='active', db_column='status')
 
     class Meta:
