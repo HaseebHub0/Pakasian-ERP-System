@@ -32,4 +32,35 @@ class MRPRun(BaseModel):
         db_table = 'mrp_runs'
 
     def __str__(self):
-        return f"MRPRun {self.run_id} — {self.status}"
+        return f"MRPRun {self.id} — {self.status}"
+
+
+class MRPPlan(BaseModel):
+    """
+    MRP output plan per product.
+    Formula: Required Production = Forecast Demand + Safety Stock - Current Inventory - Scheduled Production
+    """
+    plan_id              = models.UUIDField(default=uuid.uuid4, editable=False, unique=True, db_column='plan_id')
+    product_id           = models.ForeignKey('master_data.Product', on_delete=models.CASCADE, db_column='product_id', related_name='mrp_plans')
+    forecast_qty         = models.DecimalField(max_digits=14, decimal_places=4, default=0, db_column='forecast_qty')
+    current_inventory    = models.DecimalField(max_digits=14, decimal_places=4, default=0, db_column='current_inventory')
+    safety_stock         = models.DecimalField(max_digits=14, decimal_places=4, default=0, db_column='safety_stock')
+    scheduled_production = models.DecimalField(max_digits=14, decimal_places=4, default=0, db_column='scheduled_production')
+    required_production  = models.DecimalField(max_digits=14, decimal_places=4, default=0, db_column='required_production')
+    planned_production_date = models.DateField(db_column='planned_production_date')
+    mrp_run              = models.ForeignKey(MRPRun, null=True, blank=True, on_delete=models.SET_NULL, related_name='plans', db_column='mrp_run_id')
+
+    class Meta:
+        db_table = 'mrp_plans'
+        ordering = ['planned_production_date']
+
+    def save(self, *args, **kwargs):
+        # Formula: forecast + safety_stock - current_inventory - scheduled_production
+        self.required_production = max(
+            self.forecast_qty + self.safety_stock - self.current_inventory - self.scheduled_production,
+            0
+        )
+        super().save(*args, **kwargs)
+
+    def __str__(self):
+        return f"MRPPlan {self.product_id} — {self.planned_production_date}"

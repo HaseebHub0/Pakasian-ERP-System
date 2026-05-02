@@ -10,12 +10,15 @@ from apps.core.models import BaseModel
 # ─────────────────────────────────────────────────────────────────────────────
 MOVEMENT_TYPES = [
     ('GRN', 'Goods Receipt Note'),
-    ('DISPATCH', 'Customer Dispatch'),
-    ('TRANSFER', 'Warehouse Transfer'),
-    ('PRODUCTION', 'Production Consumption'),
+    ('PRODUCTION_ISSUE', 'Production Issue'),
+    ('PRODUCTION_OUTPUT', 'Production Output'),
+    ('TRANSFER_OUT', 'Transfer Out'),
+    ('TRANSFER_IN', 'Transfer In'),
+    ('SALES_DISPATCH', 'Sales Dispatch'),
+    ('SALES_RETURN', 'Sales Return'),
     ('ADJUSTMENT', 'Stock Adjustment'),
-    ('RETURN', 'Customer Return'),
-    ('EXPIRED', 'Expired Write-off'),
+    ('DAMAGE', 'Damage Write-off'),
+    ('EXPIRY', 'Expiry Write-off'),
 ]
 
 BATCH_STATUS_CHOICES = [

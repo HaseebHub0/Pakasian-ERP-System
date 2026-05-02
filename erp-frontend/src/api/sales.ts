@@ -10,6 +10,14 @@ export const salesAPI = {
     const response = await client.post('/api/sales/customers/', data);
     return response.data;
   },
+  updateCustomer: async (id: number | string, data: any) => {
+    const response = await client.patch(`/api/sales/customers/${id}/`, data);
+    return response.data;
+  },
+  deleteCustomer: async (id: number | string) => {
+    const response = await client.delete(`/api/sales/customers/${id}/`);
+    return response.data;
+  },
 
   // Sales Orders
   getOrders: async () => {

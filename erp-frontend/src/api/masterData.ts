@@ -101,6 +101,42 @@ export const masterDataAPI = {
     return response.data;
   },
 
+  // Customers
+  getCustomers: async () => {
+    const response = await client.get('/api/master_data/customers/');
+    return response.data.results !== undefined ? response.data.results : response.data;
+  },
+  createCustomer: async (data: any) => {
+    const response = await client.post('/api/master_data/customers/', data);
+    return response.data;
+  },
+  updateCustomer: async (id: number | string, data: any) => {
+    const response = await client.patch(`/api/master_data/customers/${id}/`, data);
+    return response.data;
+  },
+  deleteCustomer: async (id: number | string) => {
+    const response = await client.delete(`/api/master_data/customers/${id}/`);
+    return response.data;
+  },
+
+  // Packaging Materials
+  getPackagingMaterials: async () => {
+    const response = await client.get('/api/master_data/packaging-materials/');
+    return response.data.results !== undefined ? response.data.results : response.data;
+  },
+  createPackagingMaterial: async (data: any) => {
+    const response = await client.post('/api/master_data/packaging-materials/', data);
+    return response.data;
+  },
+  updatePackagingMaterial: async (id: number | string, data: any) => {
+    const response = await client.patch(`/api/master_data/packaging-materials/${id}/`, data);
+    return response.data;
+  },
+  deletePackagingMaterial: async (id: number | string) => {
+    const response = await client.delete(`/api/master_data/packaging-materials/${id}/`);
+    return response.data;
+  },
+
   // Production Lines
   getProductionLines: async () => {
     const response = await client.get('/api/master_data/production-lines/');

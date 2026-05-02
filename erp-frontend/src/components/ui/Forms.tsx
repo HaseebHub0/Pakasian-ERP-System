@@ -10,6 +10,7 @@ interface FormFieldProps {
   options?: { label: string; value: string | number }[];
   className?: string;
   required?: boolean;
+  step?: string | number;
 }
 
 export const FormField: React.FC<FormFieldProps> = ({
@@ -20,6 +21,7 @@ export const FormField: React.FC<FormFieldProps> = ({
   options,
   className,
   required,
+  step,
 }) => {
   const { register, formState: { errors } } = useFormContext();
   const error = errors[name];
@@ -62,6 +64,7 @@ export const FormField: React.FC<FormFieldProps> = ({
           id={name}
           type={type}
           placeholder={placeholder}
+          step={step}
           {...register(name)}
           className={cn(
             "w-full px-3 py-2 bg-white border rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all",

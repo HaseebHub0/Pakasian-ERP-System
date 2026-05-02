@@ -82,7 +82,6 @@ export const MachinesPage: React.FC = () => {
     setEditingMachine(machine);
     methods.reset({
       name: machine.machine_name,
-      code: machine.machine_code,
       type: machine.machine_type,
       line: machine.production_line_id,
       capacity: machine.capacity_per_hour,
@@ -120,7 +119,6 @@ export const MachinesPage: React.FC = () => {
     if (activeTab === 'machines') {
       const payload = {
         machine_name: data.name,
-        machine_code: data.code,
         machine_type: data.type,
         production_line_id: data.line,
         capacity_per_hour: parseFloat(data.capacity),
@@ -213,7 +211,7 @@ export const MachinesPage: React.FC = () => {
                     </div>
                     <div>
                       <p className="font-medium text-gray-900">{val || row.machine_name}</p>
-                      <p className="text-xs text-gray-500">{row.machine_code}</p>
+                      <p className="text-xs text-gray-500">{row.machine_type}</p>
                     </div>
                   </div>
                 )
@@ -326,8 +324,7 @@ export const MachinesPage: React.FC = () => {
               <>
                 <div className="grid grid-cols-2 gap-4">
                   <FormField name="name" label="Machine Name" placeholder="e.g. High Speed Mixer" required />
-                  <FormField name="code" label="Machine Code" placeholder="MC-..." required />
-                  <FormField 
+                  <FormField
                     name="type" 
                     label="Type" 
                     type="select"

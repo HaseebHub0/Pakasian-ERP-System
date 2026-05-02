@@ -109,14 +109,14 @@ def batch_trace(request, batch_number):
     yield_record = (
         ProductionYield.objects
         .filter(batch_id=prod_batch.id)
-        .select_related('recorded_by')
+        .select_related('batch_id')
         .first()
     )
 
     oil_logs = (
         OilConsumptionLog.objects
         .filter(batch_id=prod_batch.id)
-        .select_related('material_id', 'logged_by')
+        .select_related('oil_material_id', 'operator_id')
     )
 
     costing = (

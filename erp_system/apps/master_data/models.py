@@ -264,6 +264,43 @@ class Machine(BaseModel):
 
 
 # ─────────────────────────────────────────────────────────────────────────────
+# PackagingMaterial
+# ─────────────────────────────────────────────────────────────────────────────
+class PackagingMaterial(BaseModel):
+    MATERIAL_TYPE_CHOICES = [
+        ('primary',   'Primary Packaging'),    # direct product contact (pouches, bags)
+        ('secondary', 'Secondary Packaging'),  # outer carton / box
+        ('tertiary',  'Tertiary Packaging'),   # pallets, shrink-wrap
+    ]
+    STATUS_CHOICES = [('active', 'Active'), ('inactive', 'Inactive')]
+
+    material_code   = models.CharField(max_length=100, unique=True, db_column='material_code')
+    material_name   = models.CharField(max_length=255, db_column='material_name')
+    material_type   = models.CharField(max_length=50, choices=MATERIAL_TYPE_CHOICES, db_column='material_type')
+    unit_of_measure = models.CharField(max_length=50, db_column='unit_of_measure')
+    standard_cost   = models.DecimalField(max_digits=14, decimal_places=4, db_column='standard_cost')
+    safety_stock    = models.DecimalField(max_digits=14, decimal_places=4, default=0, db_column='safety_stock')
+    reorder_level   = models.DecimalField(max_digits=14, decimal_places=4, default=0, db_column='reorder_level')
+    current_stock   = models.DecimalField(max_digits=14, decimal_places=4, default=0, db_column='current_stock')
+    supplier        = models.ForeignKey(
+        'Supplier', null=True, blank=True,
+        on_delete=models.SET_NULL,
+        db_column='supplier_id',
+        related_name='packaging_materials',
+    )
+    status          = models.CharField(
+        max_length=20, choices=STATUS_CHOICES, default='active', db_column='status'
+    )
+
+    class Meta:
+        db_table = 'packaging_materials'
+        ordering = ['material_name']
+
+    def __str__(self):
+        return f"{self.material_code} — {self.material_name}"
+
+
+# ─────────────────────────────────────────────────────────────────────────────
 # Vehicle  (used by sales dispatch_orders.vehicle_id)
 # ─────────────────────────────────────────────────────────────────────────────
 class Vehicle(BaseModel):

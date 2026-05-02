@@ -9,12 +9,19 @@ import { RawMaterialsPage } from './pages/master-data/RawMaterials';
 import { SuppliersPage } from './pages/master-data/Suppliers';
 import { WarehousesPage } from './pages/master-data/Warehouses';
 import { MachinesPage } from './pages/master-data/Machines';
+import { PackagingMaterialsPage } from './pages/master-data/PackagingMaterials';
 import { CustomersPage } from './pages/master-data/Customers';
 import { RequisitionsPage } from './pages/procurement/Requisitions';
 import { ReorderRulesPage } from './pages/procurement/ReorderRules';
 import { PurchaseOrdersPage } from './pages/procurement/PurchaseOrders';
 import { GRNPage } from './pages/procurement/GRN';
 import { QCInspectionPage } from './pages/procurement/QC';
+import { AccountsPayablePage as ProcurementAPPage } from './pages/procurement/AccountsPayable';
+import { RFQPage } from './pages/procurement/RFQ';
+import { PurchaseReturnsPage } from './pages/procurement/PurchaseReturns';
+import { RawMaterialBatchesPage } from './pages/procurement/RawMaterialBatches';
+import { SupplierMaterialsPage } from './pages/procurement/SupplierMaterials';
+import { ProcurementAnalyticsPage } from './pages/procurement/ProcurementAnalytics';
 import { StockSummaryPage } from './pages/inventory/StockSummary';
 import { InventoryLedgerPage } from './pages/inventory/InventoryLedger';
 import { PickingListsPage } from './pages/warehouse/PickingLists';
@@ -111,6 +118,12 @@ export default function App() {
             </ProtectedRoute>
           } />
 
+          <Route path="/master-data/packaging-materials" element={
+            <ProtectedRoute permission="master-data:packaging-materials">
+              <PackagingMaterialsPage />
+            </ProtectedRoute>
+          } />
+
           <Route path="/master-data/customers" element={
             <ProtectedRoute permission="master-data:customers">
               <CustomersPage />
@@ -129,6 +142,12 @@ export default function App() {
             </ProtectedRoute>
           } />
 
+          <Route path="/procurement/rfqs" element={
+            <ProtectedRoute permission="procurement:rfqs">
+              <RFQPage />
+            </ProtectedRoute>
+          } />
+
           <Route path="/procurement/purchase-orders" element={
             <ProtectedRoute permission="procurement:purchase-orders">
               <PurchaseOrdersPage />
@@ -144,6 +163,36 @@ export default function App() {
           <Route path="/procurement/qc" element={
             <ProtectedRoute permission="procurement:qc">
               <QCInspectionPage />
+            </ProtectedRoute>
+          } />
+
+          <Route path="/procurement/accounts-payable" element={
+            <ProtectedRoute permission="procurement:*">
+              <ProcurementAPPage />
+            </ProtectedRoute>
+          } />
+
+          <Route path="/procurement/purchase-returns" element={
+            <ProtectedRoute permission="procurement:*">
+              <PurchaseReturnsPage />
+            </ProtectedRoute>
+          } />
+
+          <Route path="/procurement/raw-material-batches" element={
+            <ProtectedRoute permission="procurement:*">
+              <RawMaterialBatchesPage />
+            </ProtectedRoute>
+          } />
+
+          <Route path="/procurement/supplier-materials" element={
+            <ProtectedRoute permission="procurement:*">
+              <SupplierMaterialsPage />
+            </ProtectedRoute>
+          } />
+
+          <Route path="/procurement/analytics" element={
+            <ProtectedRoute permission="procurement:*">
+              <ProcurementAnalyticsPage />
             </ProtectedRoute>
           } />
 

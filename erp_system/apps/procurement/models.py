@@ -180,13 +180,24 @@ class RequestForQuotation(BaseModel):
         ('Received', 'Quotation Received'),
         ('Closed',   'Closed'),
     ]
+    rfq_number     = models.CharField(max_length=50, unique=True, blank=True, db_column='rfq_number')
     requisition_id = models.ForeignKey(PurchaseRequisition, on_delete=models.SET_NULL, null=True, blank=True, db_column='requisition_id')
     supplier_id    = models.ForeignKey('master_data.Supplier', on_delete=models.CASCADE, db_column='supplier_id')
+    material_id    = models.ForeignKey('master_data.RawMaterial', on_delete=models.SET_NULL, null=True, blank=True, db_column='material_id')
+    quantity       = models.DecimalField(max_digits=14, decimal_places=3, null=True, blank=True, db_column='quantity')
+    required_date  = models.DateField(null=True, blank=True, db_column='required_date')
+    notes          = models.TextField(blank=True, default='', db_column='notes')
     rfq_date       = models.DateField(default=datetime.date.today, db_column='rfq_date')
     status         = models.CharField(max_length=20, choices=STATUS_CHOICES, default='Draft', db_column='status')
 
     class Meta:
         db_table = 'request_for_quotations'
+
+    def save(self, *args, **kwargs):
+        if not self.rfq_number:
+            from apps.core.utils.number_generator import generate_rfq_number
+            self.rfq_number = generate_rfq_number()
+        super().save(*args, **kwargs)
 
 
 class Quotation(BaseModel):
@@ -319,8 +330,11 @@ class RawMaterialBatch(BaseModel):
     ]
 
     material_id      = models.ForeignKey('master_data.RawMaterial', on_delete=models.CASCADE, db_column='material_id')
+    supplier_id      = models.ForeignKey('master_data.Supplier', on_delete=models.SET_NULL, null=True, blank=True, db_column='supplier_id')
+    warehouse_id     = models.ForeignKey('master_data.Warehouse', on_delete=models.SET_NULL, null=True, blank=True, db_column='warehouse_id')
     batch_number     = models.CharField(max_length=100, unique=True, db_column='batch_number')
     supplier_batch   = models.CharField(max_length=100, blank=True, default='', db_column='supplier_batch')
+    quantity         = models.DecimalField(max_digits=14, decimal_places=3, default=0, db_column='quantity')
     manufacture_date = models.DateField(null=True, blank=True, db_column='manufacture_date')
     expiry_date      = models.DateField(null=True, blank=True, db_column='expiry_date')
     status           = models.CharField(max_length=20, choices=STATUS_CHOICES, default='Hold', db_column='status')

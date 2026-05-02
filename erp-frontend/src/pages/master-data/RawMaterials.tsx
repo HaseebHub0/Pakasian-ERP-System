@@ -77,7 +77,7 @@ export const RawMaterialsPage: React.FC = () => {
     }
   });
 
-  const baseTypes = ['Ingredient', 'Oil', 'Spice', 'Packaging', 'Additive'];
+  const baseTypes = ['ingredient', 'oil', 'spice', 'packaging', 'additive'];
   const allTypes = Array.from(new Set([...baseTypes, ...rawMaterials.map((rm: any) => rm.material_type)])).filter(Boolean);
   const materialTypesOptions = allTypes.map((type: any) => ({
     label: type,

@@ -1,254 +1,222 @@
 import React from 'react';
-import { FileText, Truck, Clock, CheckCircle, Package, Plus, Search, Trash2 } from 'lucide-react';
+import { Plus, CheckCircle, Send, Trash2 } from 'lucide-react';
 import { Table, Badge, Modal } from '@/components/ui/Shared';
 import { SearchBar, FormField } from '@/components/ui/Forms';
 import { formatCurrency, formatDate, getStatusColor } from '@/utils/formatters';
-import { cn } from '@/utils/cn';
-import toast from 'react-hot-toast';
-import { useAuthStore } from '@/store/useAuthStore';
-import { useApprovalStore } from '@/store/useApprovalStore';
-import { useAuditStore } from '@/store/useAuditStore';
-import { useProcurementStore, PurchaseOrder } from '@/store/useProcurementStore';
 import { useForm, FormProvider, useFieldArray } from 'react-hook-form';
+import toast from 'react-hot-toast';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { procurementAPI } from '@/api/procurement';
+import { masterDataAPI } from '@/api/masterData';
 
 export const PurchaseOrdersPage: React.FC = () => {
-  const [selectedPO, setSelectedPO] = React.useState<PurchaseOrder | null>(null);
+  const queryClient = useQueryClient();
   const [isModalOpen, setIsModalOpen] = React.useState(false);
-  const { user } = useAuthStore();
-  const { purchaseOrders, addPO, updatePOStatus, requisitions, updatePRStatus } = useProcurementStore();
-  const addApprovalRequest = useApprovalStore(state => state.addRequest);
-  const addLog = useAuditStore(state => state.addLog);
+  const [searchTerm, setSearchTerm] = React.useState('');
+
+  const { data: pos = [], isLoading } = useQuery({ queryKey: ['purchase-orders'], queryFn: procurementAPI.getPurchaseOrders });
+  const { data: suppliers = [] } = useQuery({ queryKey: ['suppliers'], queryFn: masterDataAPI.getSuppliers });
+  const { data: warehouses = [] } = useQuery({ queryKey: ['warehouses'], queryFn: masterDataAPI.getWarehouses });
+  const { data: materials = [] } = useQuery({ queryKey: ['raw-materials'], queryFn: masterDataAPI.getRawMaterials });
+  const { data: paymentTerms = [] } = useQuery({ queryKey: ['payment-terms'], queryFn: procurementAPI.getPaymentTerms });
+
+  const supplierOptions = suppliers.map((s: any) => ({ label: s.supplier_name, value: s.id }));
+  const warehouseOptions = warehouses.map((w: any) => ({ label: w.warehouse_name, value: w.id }));
+  const materialOptions = materials.map((m: any) => ({ label: m.material_name, value: m.id }));
+  const paymentTermOptions = paymentTerms.map((p: any) => ({ label: p.term_name, value: p.id }));
+
+  const createMutation = useMutation({
+    mutationFn: procurementAPI.createPurchaseOrder,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['purchase-orders'] });
+      toast.success('PO created');
+      setIsModalOpen(false);
+      methods.reset();
+    },
+    onError: (e: any) => toast.error(e?.response?.data?.detail || 'Create failed'),
+  });
+
+  const approveMutation = useMutation({
+    mutationFn: procurementAPI.approvePO,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['purchase-orders'] });
+      toast.success('PO approved');
+    },
+    onError: (e: any) => toast.error(e?.response?.data?.error || 'Approve failed'),
+  });
+
+  const sendMutation = useMutation({
+    mutationFn: procurementAPI.sendPOToSupplier,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['purchase-orders'] });
+      toast.success('PO sent to supplier');
+    },
+    onError: (e: any) => toast.error(e?.response?.data?.error || 'Send failed'),
+  });
+
+  const deleteMutation = useMutation({
+    mutationFn: procurementAPI.deletePurchaseOrder,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['purchase-orders'] });
+      toast.success('PO cancelled');
+    },
+    onError: (e: any) => toast.error(e?.response?.data?.error || 'Delete failed'),
+  });
 
   const methods = useForm({
     defaultValues: {
-      supplierId: '',
-      supplierName: '',
-      expectedDelivery: '',
-      prId: '',
-      items: [{ materialId: '', materialName: '', quantity: 0, unit: '', price: 0 }]
-    }
+      supplier_id: '',
+      warehouse_id: '',
+      payment_terms: '',
+      expected_delivery: '',
+      currency: 'PKR',
+      items: [{ material_id: '', ordered_quantity: '', unit_price: '', tax_rate: '0', discount: '0' }],
+    },
   });
-
-  const { fields, append, remove } = useFieldArray({
-    control: methods.control,
-    name: "items"
-  });
+  const { fields, append, remove } = useFieldArray({ control: methods.control, name: 'items' });
 
   const onSubmit = (data: any) => {
-    if (!user) return;
-
-    const totalAmount = data.items.reduce((acc: number, item: any) => 
-      acc + (parseFloat(item.quantity) || 0) * (parseFloat(item.price) || 0), 0
-    );
-
-    addPO({
-      supplierId: data.supplierId,
-      supplierName: data.supplierName,
-      date: new Date().toISOString(),
-      expectedDelivery: data.expectedDelivery,
-      prId: data.prId,
-      items: data.items.map((item: any) => ({
-        ...item,
-        quantity: parseFloat(item.quantity),
-        price: parseFloat(item.price),
-        total: parseFloat(item.quantity) * parseFloat(item.price)
-      })),
-      totalAmount,
-      createdBy: user.name,
-    });
-
-    if (data.prId) {
-      updatePRStatus(data.prId, 'Converted');
-    }
-
-    addLog({
-      userId: user.id.toString(),
-      userName: user.name,
-      action: 'CREATE_PO',
-      module: 'Procurement',
-      details: `Created PO for ${data.supplierName} - Amount: ${formatCurrency(totalAmount)}`,
-      status: 'success'
-    });
-
-    toast.success('Purchase Order created as Draft');
-    setIsModalOpen(false);
-    methods.reset();
+    const payload: any = {
+      supplier_id: data.supplier_id,
+      warehouse_id: data.warehouse_id || null,
+      payment_terms: data.payment_terms || null,
+      expected_delivery: data.expected_delivery || null,
+      currency: data.currency,
+      status: 'Draft',
+      items: data.items
+        .filter((i: any) => i.material_id)
+        .map((i: any) => ({
+          material_id: i.material_id,
+          ordered_quantity: parseFloat(i.ordered_quantity || 0),
+          unit_price: parseFloat(i.unit_price || 0),
+          tax_rate: parseFloat(i.tax_rate || 0),
+          discount: parseFloat(i.discount || 0),
+        })),
+    };
+    createMutation.mutate(payload);
   };
 
-  const sendToSupplier = (po: PurchaseOrder) => {
-    if (!user) return;
-    updatePOStatus(po.id, 'Sent');
-    addLog({
-      userId: user.id.toString(),
-      userName: user.name,
-      action: 'SEND_PO',
-      module: 'Procurement',
-      details: `Sent PO ${po.id} to supplier ${po.supplierName}`,
-      status: 'success'
-    });
-    toast.success('PO sent to supplier');
-    if (selectedPO?.id === po.id) {
-      setSelectedPO({ ...po, status: 'Sent' });
-    }
-  };
-
-  const handleConvertPR = (pr: any) => {
-    methods.reset({
-      prId: pr.id,
-      supplierId: '',
-      supplierName: '',
-      expectedDelivery: '',
-      items: pr.items.map((item: any) => ({
-        materialId: item.materialId,
-        materialName: item.materialName,
-        quantity: item.quantity,
-        unit: item.unit,
-        price: item.estimatedCost
-      }))
-    });
-    setIsModalOpen(true);
-  };
+  const filtered = pos.filter((p: any) =>
+    p.po_number?.toLowerCase().includes(searchTerm.toLowerCase())
+  );
 
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
           <h2 className="text-2xl font-bold text-gray-800">Purchase Orders</h2>
-          <p className="text-sm text-gray-500">Manage external procurement and vendor tracking</p>
+          <p className="text-sm text-gray-500">Formal purchase orders issued to suppliers</p>
         </div>
-        <div className="flex gap-3">
-          <button onClick={() => setIsModalOpen(true)} className="btn btn-primary gap-2">
-            <Plus size={18} />
-            Create PO
-          </button>
-        </div>
+        <button onClick={() => setIsModalOpen(true)} className="btn btn-primary gap-2">
+          <Plus size={18} /> Create PO
+        </button>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
-        <div className="lg:col-span-3 space-y-6">
-          <div className="bg-white rounded-xl border shadow-sm overflow-hidden">
-            <div className="p-4 border-b">
-              <SearchBar onSearch={() => {}} placeholder="Search POs..." />
-            </div>
-            <Table
-              columns={[
-                { header: 'PO Number', accessor: 'id' },
-                { header: 'Supplier', accessor: 'supplierName' },
-                { header: 'Date', accessor: 'date', render: (val) => formatDate(val) },
-                { header: 'Items', accessor: 'items', render: (val) => val.length },
-                { header: 'Total', accessor: 'totalAmount', render: (val) => formatCurrency(val) },
-                { 
-                  header: 'Status', 
-                  accessor: 'status', 
-                  render: (val) => <Badge color={getStatusColor(val)}>{val}</Badge> 
-                },
-              ]}
-              data={purchaseOrders}
-              onRowClick={(row) => setSelectedPO(row)}
-            />
-          </div>
+      <div className="bg-white rounded-xl border shadow-sm">
+        <div className="p-4 border-b">
+          <SearchBar onSearch={setSearchTerm} placeholder="Search PO number..." />
         </div>
-
-        <div className="space-y-6">
-          <div className="bg-white p-6 rounded-xl border shadow-sm">
-            <h4 className="font-bold mb-4 flex items-center gap-2">
-              <FileText size={18} /> Approved PRs
-            </h4>
-            <div className="space-y-3">
-              {requisitions.filter(pr => pr.status === 'Approved').map(pr => (
-                <div key={pr.id} className="p-3 border rounded-lg hover:border-primary/30 transition-colors cursor-pointer" onClick={() => handleConvertPR(pr)}>
-                  <div className="flex justify-between items-start mb-1">
-                    <span className="font-bold text-sm">{pr.id}</span>
-                    <Badge color="bg-green-100 text-green-800 text-[10px]">Approved</Badge>
-                  </div>
-                  <p className="text-xs text-gray-500">{pr.department}</p>
-                  <p className="text-xs font-medium mt-1">{formatCurrency(pr.totalAmount)}</p>
-                  <button className="w-full mt-2 btn btn-outline btn-sm py-1 text-[10px]">Convert to PO</button>
+        <Table
+          columns={[
+            { header: 'PO Number', accessor: 'po_number' },
+            { header: 'Supplier', accessor: 'supplier_name' },
+            { header: 'Order Date', accessor: 'order_date', render: (v) => formatDate(v) },
+            { header: 'Expected', accessor: 'expected_delivery', render: (v) => (v ? formatDate(v) : '—') },
+            { header: 'Total', accessor: 'total_amount', render: (v) => formatCurrency(v) },
+            { header: 'Status', accessor: 'status', render: (v) => <Badge color={getStatusColor(v)}>{v}</Badge> },
+            {
+              header: 'Actions',
+              accessor: 'id',
+              render: (_, row) => (
+                <div className="flex items-center gap-1">
+                  {row.status === 'Draft' && (
+                    <>
+                      <button
+                        onClick={() => approveMutation.mutate(row.id)}
+                        className="p-1 text-green-600 hover:bg-green-50 rounded"
+                        title="Approve"
+                      >
+                        <CheckCircle size={16} />
+                      </button>
+                      <button
+                        onClick={() => deleteMutation.mutate(row.id)}
+                        className="p-1 text-red-600 hover:bg-red-50 rounded"
+                        title="Cancel"
+                      >
+                        <Trash2 size={16} />
+                      </button>
+                    </>
+                  )}
+                  {row.status === 'Approved' && (
+                    <button
+                      onClick={() => sendMutation.mutate(row.id)}
+                      className="p-1 text-blue-600 hover:bg-blue-50 rounded"
+                      title="Send to Supplier"
+                    >
+                      <Send size={16} />
+                    </button>
+                  )}
                 </div>
-              ))}
-              {requisitions.filter(pr => pr.status === 'Approved').length === 0 && (
-                <p className="text-xs text-gray-400 text-center py-4 italic">No approved PRs pending</p>
-              )}
-            </div>
-          </div>
-        </div>
+              ),
+            },
+          ]}
+          data={filtered}
+        />
+        {isLoading && <p className="p-4 text-sm text-gray-500">Loading...</p>}
       </div>
-
-      {selectedPO && (
-        <Modal isOpen={!!selectedPO} onClose={() => setSelectedPO(null)} title={`PO Details: ${selectedPO.id}`} size="xl">
-          <div className="space-y-6">
-            <div className="flex items-center justify-between">
-              <div>
-                <h3 className="text-xl font-bold text-gray-900">{selectedPO.supplierName}</h3>
-                <p className="text-sm text-gray-500">PO Date: {formatDate(selectedPO.date)}</p>
-              </div>
-              <div className="flex items-center gap-3">
-                {selectedPO.status === 'Draft' && (
-                  <button onClick={() => sendToSupplier(selectedPO)} className="btn btn-primary btn-sm py-1">
-                    Send to Supplier
-                  </button>
-                )}
-                <Badge color={getStatusColor(selectedPO.status)} className="px-4 py-1 text-sm">
-                  {selectedPO.status}
-                </Badge>
-              </div>
-            </div>
-
-            <Table
-              columns={[
-                { header: 'Material', accessor: 'materialName' },
-                { header: 'Quantity', accessor: 'quantity' },
-                { header: 'Unit', accessor: 'unit' },
-                { header: 'Price', accessor: 'price', render: (val) => formatCurrency(val) },
-                { header: 'Total', accessor: 'total', render: (val) => formatCurrency(val) },
-              ]}
-              data={selectedPO.items}
-            />
-
-            <div className="flex justify-end">
-              <div className="w-64 space-y-2">
-                <div className="flex justify-between text-lg font-bold border-t pt-2">
-                  <span>Total</span>
-                  <span>{formatCurrency(selectedPO.totalAmount)}</span>
-                </div>
-              </div>
-            </div>
-          </div>
-        </Modal>
-      )}
 
       <Modal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} title="Create Purchase Order" size="xl">
         <FormProvider {...methods}>
           <form onSubmit={methods.handleSubmit(onSubmit)} className="space-y-6">
-            <div className="grid grid-cols-2 gap-4">
-              <FormField name="supplierName" label="Supplier Name" required />
-              <FormField name="expectedDelivery" label="Expected Delivery" type="date" required />
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+              <FormField name="supplier_id" label="Supplier" type="select" options={supplierOptions} required />
+              <FormField name="warehouse_id" label="Warehouse" type="select" options={warehouseOptions} />
+              <FormField name="payment_terms" label="Payment Terms" type="select" options={paymentTermOptions} />
+              <FormField name="expected_delivery" label="Expected Delivery" type="date" />
             </div>
-            
-            <div className="space-y-4">
-              <h4 className="font-bold text-sm">PO Items</h4>
-              {fields.map((field, index) => (
-                <div key={field.id} className="grid grid-cols-5 gap-3 p-3 bg-gray-50 rounded-lg border">
-                  <div className="col-span-2">
-                    <FormField name={`items.${index}.materialName`} label="Material" />
+
+            <div className="space-y-3">
+              <h4 className="font-medium text-sm">Items (note: items are added via detail view after saving)</h4>
+              {fields.map((field, idx) => (
+                <div key={field.id} className="p-3 bg-gray-50 rounded border grid grid-cols-12 gap-2">
+                  <div className="col-span-4">
+                    <FormField name={`items.${idx}.material_id`} label="Material" type="select" options={materialOptions} />
                   </div>
-                  <FormField name={`items.${index}.quantity`} label="Qty" />
-                  <FormField name={`items.${index}.price`} label="Price" />
-                  <div className="flex items-end justify-center pb-2">
-                    <button type="button" onClick={() => remove(index)} className="text-red-500 hover:bg-red-50 p-1 rounded">
-                      <Trash2 size={18} />
+                  <div className="col-span-2">
+                    <FormField name={`items.${idx}.ordered_quantity`} label="Qty" />
+                  </div>
+                  <div className="col-span-2">
+                    <FormField name={`items.${idx}.unit_price`} label="Unit Price" />
+                  </div>
+                  <div className="col-span-1">
+                    <FormField name={`items.${idx}.tax_rate`} label="Tax %" />
+                  </div>
+                  <div className="col-span-1">
+                    <FormField name={`items.${idx}.discount`} label="Disc %" />
+                  </div>
+                  <div className="col-span-1 flex items-end">
+                    <button type="button" onClick={() => remove(idx)} className="p-2 text-red-500 hover:bg-red-100 rounded">
+                      <Trash2 size={16} />
                     </button>
                   </div>
                 </div>
               ))}
-              <button type="button" onClick={() => append({ materialId: '', materialName: '', quantity: 0, unit: '', price: 0 })} className="btn btn-outline btn-sm">
-                + Add Item
+              <button
+                type="button"
+                onClick={() => append({ material_id: '', ordered_quantity: '', unit_price: '', tax_rate: '0', discount: '0' })}
+                className="btn btn-outline btn-sm gap-2"
+              >
+                <Plus size={14} /> Add Item
               </button>
             </div>
 
             <div className="flex justify-end gap-3 pt-4 border-t">
-              <button type="button" onClick={() => setIsModalOpen(false)} className="btn btn-outline">Cancel</button>
-              <button type="submit" className="btn btn-primary">Create PO</button>
+              <button type="button" onClick={() => setIsModalOpen(false)} className="btn btn-outline">
+                Cancel
+              </button>
+              <button type="submit" className="btn btn-primary" disabled={createMutation.isPending}>
+                Save PO (Draft)
+              </button>
             </div>
           </form>
         </FormProvider>

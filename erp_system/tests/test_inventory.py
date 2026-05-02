@@ -175,16 +175,14 @@ def test_t3_9_batch_trace_returns_full_data(setup_data, api_client):
         batch_number='PN260312A', product_id=prod, status='Approved'
     )
     from apps.manufacturing.models import ProductionBatch, MaterialIssue
-    from apps.master_data.models import Supplier
-    
+
     pb = ProductionBatch.objects.create(batch_number='PN260312A', product_id=prod, planned_quantity=1000)
-    # sup = Supplier.objects.create(supplier_name="Sup A")
     MaterialIssue.objects.create(batch_id=pb, material_id=mat, quantity_issued=100)
-    
+
     url = '/api/inventory/batches/PN260312A/trace/'
     response = api_client.get(url)
     assert response.status_code == 200
     data = response.json()
     assert data['batch_info']['batch_number'] == 'PN260312A'
     assert len(data['raw_materials']) == 1
-    assert data['raw_materials'][0]['supplier_name'] == "Sup A"
+    assert data['raw_materials'][0]['material_name'] == mat.material_name

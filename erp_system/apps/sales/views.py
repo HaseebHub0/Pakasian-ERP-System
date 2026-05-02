@@ -40,7 +40,8 @@ class CustomerViewSet(viewsets.ModelViewSet):
     queryset           = Customer.objects.all()
     serializer_class   = CustomerSerializer
     permission_classes = [IsAuthenticated]
-    filterset_fields   = ['region', 'status', 'city']
+    filterset_fields   = ['region', 'status', 'city', 'customer_type']
+    search_fields      = ['customer_name', 'contact_person', 'phone', 'email']
 
     @action(detail=True, methods=['get'], url_path='credit-status')
     def credit_status(self, request, pk=None):

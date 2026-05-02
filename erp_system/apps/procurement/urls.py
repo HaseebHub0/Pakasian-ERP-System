@@ -8,6 +8,7 @@ from .views import (
     GoodsReceiptViewSet, RawMaterialBatchViewSet,
     QcInspectionViewSet, PurchaseReturnViewSet,
     AccountsPayableViewSet, ReorderRuleViewSet,
+    procurement_analytics,
 )
 
 router = DefaultRouter()
@@ -28,4 +29,5 @@ router.register(r'reorder-rules',           ReorderRuleViewSet,            basen
 
 urlpatterns = [
     path('', include(router.urls)),
+    path('analytics/', procurement_analytics, name='procurement-analytics'),
 ]

@@ -38,11 +38,27 @@ class Customer(BaseModel):
         ('ADVANCE', 'Advance Payment'),
     ]
 
+    CUSTOMER_TYPE_CHOICES = [
+        ('retailer',     'Retailer'),
+        ('distributor',  'Distributor'),
+        ('wholesaler',   'Wholesaler'),
+        ('modern_trade', 'Modern Trade'),
+        ('institutional','Institutional'),
+    ]
+
     id                = models.UUIDField(
         primary_key=True, default=uuid.uuid4, editable=False,
         db_column='customer_id',
     )
     customer_name     = models.CharField(max_length=255, db_column='customer_name')
+    customer_type     = models.CharField(
+        max_length=20, choices=CUSTOMER_TYPE_CHOICES, default='retailer',
+        db_column='customer_type',
+    )
+    contact_person    = models.CharField(max_length=150, blank=True, default='', db_column='contact_person')
+    phone             = models.CharField(max_length=50, blank=True, default='', db_column='phone')
+    email             = models.EmailField(blank=True, default='', db_column='email')
+    address           = models.TextField(blank=True, default='', db_column='address')
     region            = models.CharField(
         max_length=20, choices=REGION_CHOICES, db_column='region',
     )

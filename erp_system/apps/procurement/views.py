@@ -1,9 +1,13 @@
+from decimal import Decimal
 from django.db import transaction
+from django.db.models import Sum, Count, Avg, Q
+from django.utils import timezone
 from rest_framework import viewsets, status
-from rest_framework.decorators import action
+from rest_framework.decorators import action, api_view, permission_classes
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 
+from apps.inventory.models import InventorySummary
 from .models import (
     ApprovalWorkflow, PaymentTerm,
     SupplierMaterial, SupplierPriceHistory,
@@ -333,3 +337,128 @@ class ReorderRuleViewSet(viewsets.ModelViewSet):
     serializer_class = ReorderRuleSerializer
     permission_classes = [IsAuthenticated]
     filterset_fields = ['material_id', 'warehouse_id']
+
+    @action(detail=True, methods=['post'], url_path='check_reorder')
+    def check_reorder(self, request, pk=None):
+        """
+        P12 — Automatic Reorder:
+        Check if current available_stock < minimum_stock.
+        If yes, auto-create a Draft PurchaseRequisition for reorder_quantity.
+        """
+        rule = self.get_object()
+        summary = InventorySummary.objects.filter(
+            material_id=rule.material_id,
+            warehouse_id=rule.warehouse_id,
+        ).first()
+
+        available = summary.available_stock if summary else Decimal('0')
+
+        if available < rule.minimum_stock:
+            with transaction.atomic():
+                pr = PurchaseRequisition.objects.create(
+                    department='Auto-Reorder',
+                    status='Draft',
+                )
+                PurchaseRequisitionItem.objects.create(
+                    requisition_id=pr,
+                    material_id=rule.material_id,
+                    requested_quantity=rule.reorder_quantity,
+                    warehouse_id=rule.warehouse_id,
+                )
+            return Response({
+                'message': 'Stock below minimum. Purchase Requisition auto-created.',
+                'available_stock': str(available),
+                'minimum_stock': str(rule.minimum_stock),
+                'pr_number': pr.requisition_number,
+                'pr_id': str(pr.id),
+            }, status=status.HTTP_201_CREATED)
+
+        return Response({
+            'message': 'Stock is sufficient. No reorder needed.',
+            'available_stock': str(available),
+            'minimum_stock': str(rule.minimum_stock),
+        }, status=status.HTTP_200_OK)
+
+
+# ── 15. Procurement Analytics ──────────────────────────────────────────────────
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def procurement_analytics(request):
+    """
+    P11 — Procurement Analytics Dashboard.
+    Returns: monthly_spend, top_suppliers, price_fluctuations, supplier_rejection_rate.
+    """
+    now = timezone.now()
+
+    # Monthly spend (last 12 months, from AccountsPayable)
+    monthly_spend = []
+    for i in range(11, -1, -1):
+        if now.month - i <= 0:
+            month = now.month - i + 12
+            year = now.year - 1
+        else:
+            month = now.month - i
+            year = now.year
+        total = AccountsPayable.objects.filter(
+            created_at__year=year,
+            created_at__month=month,
+        ).aggregate(total=Sum('amount'))['total'] or Decimal('0')
+        monthly_spend.append({
+            'year': year,
+            'month': month,
+            'total': float(total),
+        })
+
+    # Top 5 suppliers by total AP amount
+    top_suppliers = (
+        AccountsPayable.objects
+        .values('supplier_id', 'supplier_id__supplier_name')
+        .annotate(total_spend=Sum('amount'), invoice_count=Count('id'))
+        .order_by('-total_spend')[:5]
+    )
+    top_suppliers_data = [
+        {
+            'supplier_id': str(row['supplier_id']),
+            'supplier_name': row['supplier_id__supplier_name'],
+            'total_spend': float(row['total_spend'] or 0),
+            'invoice_count': row['invoice_count'],
+        }
+        for row in top_suppliers
+    ]
+
+    # Price fluctuations — materials whose SupplierPriceHistory has > 1 entry
+    price_fluctuations = (
+        SupplierPriceHistory.objects
+        .values('material_id', 'material_id__material_name')
+        .annotate(
+            price_changes=Count('id'),
+            avg_price=Avg('price'),
+        )
+        .filter(price_changes__gt=1)
+        .order_by('-price_changes')[:10]
+    )
+    price_fluctuations_data = [
+        {
+            'material_id': str(row['material_id']),
+            'material_name': row['material_id__material_name'],
+            'price_changes': row['price_changes'],
+            'avg_price': float(row['avg_price'] or 0),
+        }
+        for row in price_fluctuations
+    ]
+
+    # Supplier rejection rate — QC rejections per supplier (via GRN)
+    total_inspections = QcInspection.objects.count()
+    rejected = QcInspection.objects.filter(result='Rejected').count()
+    rejection_rate = round((rejected / total_inspections * 100), 2) if total_inspections else 0.0
+
+    return Response({
+        'monthly_spend': monthly_spend,
+        'top_suppliers': top_suppliers_data,
+        'price_fluctuations': price_fluctuations_data,
+        'supplier_rejection_rate': {
+            'total_inspections': total_inspections,
+            'rejected': rejected,
+            'rejection_rate_pct': rejection_rate,
+        },
+    })

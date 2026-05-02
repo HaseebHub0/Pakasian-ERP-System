@@ -33,6 +33,9 @@ def generate_po_number():
 def generate_grn_number():
     return _generate_number('procurement.GoodsReceipt', 'GRN', 'grn_number')
 
+def generate_rfq_number():
+    return _generate_number('procurement.RequestForQuotation', 'RFQ', 'rfq_number')
+
 def generate_so_number():
     return _generate_number('sales.SalesOrder', 'SO', 'so_number')
 

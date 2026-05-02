@@ -6,13 +6,13 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 
 from .models import (
-    Product, ProductCategory, RawMaterial, Supplier,
+    Product, ProductCategory, RawMaterial, PackagingMaterial, Supplier,
     Warehouse, WarehouseBin, Machine, ProductionLine,
 )
 from .serializers import (
     ProductSerializer, ProductCategorySerializer, RawMaterialSerializer,
-    SupplierSerializer, WarehouseSerializer, WarehouseBinSerializer,
-    MachineSerializer, ProductionLineSerializer,
+    PackagingMaterialSerializer, SupplierSerializer, WarehouseSerializer,
+    WarehouseBinSerializer, MachineSerializer, ProductionLineSerializer,
 )
 
 
@@ -163,6 +163,24 @@ class SupplierViewSet(viewsets.ModelViewSet):
         instance.save(update_fields=['status', 'updated_at'])
         return Response(
             {'message': f"Supplier '{instance.supplier_name}' deactivated."},
+            status=status.HTTP_200_OK,
+        )
+
+
+class PackagingMaterialViewSet(viewsets.ModelViewSet):
+    queryset = PackagingMaterial.objects.select_related('supplier').all()
+    serializer_class = PackagingMaterialSerializer
+    permission_classes = [IsAuthenticated]
+    filterset_fields = ['material_type', 'status', 'supplier']
+    search_fields = ['material_name', 'material_code']
+
+    def destroy(self, request, *args, **kwargs):
+        """Soft delete — set status=inactive."""
+        instance = self.get_object()
+        instance.status = 'inactive'
+        instance.save(update_fields=['status', 'updated_at'])
+        return Response(
+            {'message': f"Packaging material '{instance.material_code}' deactivated."},
             status=status.HTTP_200_OK,
         )
 

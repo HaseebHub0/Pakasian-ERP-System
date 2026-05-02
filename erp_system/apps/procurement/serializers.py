@@ -39,6 +39,9 @@ class SupplierPriceHistorySerializer(serializers.ModelSerializer):
 
 
 class PurchaseRequisitionItemSerializer(serializers.ModelSerializer):
+    material_name = serializers.CharField(source='material_id.material_name', read_only=True)
+    warehouse_name = serializers.CharField(source='warehouse_id.warehouse_name', read_only=True, default=None)
+
     class Meta:
         model = PurchaseRequisitionItem
         fields = '__all__'
@@ -71,6 +74,8 @@ class PurchaseRequisitionWriteSerializer(serializers.ModelSerializer):
 
 
 class QuotationSerializer(serializers.ModelSerializer):
+    supplier_name = serializers.CharField(source='supplier_id.supplier_name', read_only=True)
+
     class Meta:
         model = Quotation
         fields = '__all__'
@@ -78,13 +83,18 @@ class QuotationSerializer(serializers.ModelSerializer):
 
 class RequestForQuotationSerializer(serializers.ModelSerializer):
     quotations = QuotationSerializer(many=True, read_only=True)
+    supplier_name = serializers.CharField(source='supplier_id.supplier_name', read_only=True)
+    material_name = serializers.CharField(source='material_id.material_name', read_only=True, default=None)
 
     class Meta:
         model = RequestForQuotation
         fields = '__all__'
+        read_only_fields = ['rfq_number']
 
 
 class PurchaseOrderItemSerializer(serializers.ModelSerializer):
+    material_name = serializers.CharField(source='material_id.material_name', read_only=True)
+
     class Meta:
         model = PurchaseOrderItem
         fields = '__all__'
@@ -93,6 +103,8 @@ class PurchaseOrderItemSerializer(serializers.ModelSerializer):
 
 class PurchaseOrderSerializer(serializers.ModelSerializer):
     items = PurchaseOrderItemSerializer(many=True, read_only=True)
+    supplier_name = serializers.CharField(source='supplier_id.supplier_name', read_only=True)
+    warehouse_name = serializers.CharField(source='warehouse_id.warehouse_name', read_only=True, default=None)
 
     class Meta:
         model = PurchaseOrder
@@ -111,11 +123,17 @@ class PurchaseOrderWriteSerializer(serializers.ModelSerializer):
     def create(self, validated_data):
         items_data = validated_data.pop('items', [])
         po = PurchaseOrder.objects.create(**validated_data)
-        # Total amount is calculated via signal or override later
+        for item in items_data:
+            PurchaseOrderItem.objects.create(po_id=po, **item)
+        # Recalculate total
+        po.total_amount = sum(i.total_price for i in po.items.all())
+        po.save(update_fields=['total_amount', 'updated_at'])
         return po
 
 
 class GoodsReceiptItemSerializer(serializers.ModelSerializer):
+    material_name = serializers.CharField(source='material_id.material_name', read_only=True)
+
     class Meta:
         model = GoodsReceiptItem
         fields = '__all__'
@@ -124,6 +142,8 @@ class GoodsReceiptItemSerializer(serializers.ModelSerializer):
 
 class GoodsReceiptSerializer(serializers.ModelSerializer):
     items = GoodsReceiptItemSerializer(many=True, read_only=True)
+    supplier_name = serializers.CharField(source='supplier_id.supplier_name', read_only=True)
+    po_number = serializers.CharField(source='po_id.po_number', read_only=True, default=None)
 
     class Meta:
         model = GoodsReceipt
@@ -148,30 +168,47 @@ class GoodsReceiptWriteSerializer(serializers.ModelSerializer):
 
 
 class RawMaterialBatchSerializer(serializers.ModelSerializer):
+    material_name = serializers.CharField(source='material_id.material_name', read_only=True)
+    supplier_name = serializers.CharField(source='supplier_id.supplier_name', read_only=True, default=None)
+    warehouse_name = serializers.CharField(source='warehouse_id.warehouse_name', read_only=True, default=None)
+
     class Meta:
         model = RawMaterialBatch
         fields = '__all__'
 
 
 class QcInspectionSerializer(serializers.ModelSerializer):
+    material_name = serializers.CharField(source='material_id.material_name', read_only=True)
+    grn_number = serializers.CharField(source='grn_id.grn_number', read_only=True, default=None)
+    batch_number = serializers.CharField(source='batch_id.batch_number', read_only=True, default=None)
+
     class Meta:
         model = QcInspection
         fields = '__all__'
 
 
 class PurchaseReturnSerializer(serializers.ModelSerializer):
+    material_name = serializers.CharField(source='material_id.material_name', read_only=True)
+    grn_number = serializers.CharField(source='grn_id.grn_number', read_only=True, default=None)
+
     class Meta:
         model = PurchaseReturn
         fields = '__all__'
 
 
 class AccountsPayableSerializer(serializers.ModelSerializer):
+    supplier_name = serializers.CharField(source='supplier_id.supplier_name', read_only=True)
+    po_number = serializers.CharField(source='po_id.po_number', read_only=True, default=None)
+
     class Meta:
         model = AccountsPayable
         fields = '__all__'
 
 
 class ReorderRuleSerializer(serializers.ModelSerializer):
+    material_name = serializers.CharField(source='material_id.material_name', read_only=True)
+    warehouse_name = serializers.CharField(source='warehouse_id.warehouse_name', read_only=True, default=None)
+
     class Meta:
         model = ReorderRule
         fields = '__all__'

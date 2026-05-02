@@ -44,20 +44,21 @@ class ProcurementService:
     @transaction.atomic
     def post_grn_to_inventory(grn):
         """
-        Create InventoryLedger entry movement_type='GRN' (transaction_type='GRN' in our model)
-        for each received & accepted item in the GoodsReceipt.
+        Create InventoryLedger entry (movement_type='GRN') for each accepted GRN item.
+        Also updates InventorySummary via the ledger's save() signal.
         """
         for item in grn.items.all():
             if item.accepted_qty > 0:
                 InventoryLedger.objects.create(
-                    item_id=item.material_id.id,
-                    warehouse_id=grn.warehouse_id.id,
-                    transaction_type='GRN',
+                    item_type='Material',
+                    material_id=item.material_id,
+                    warehouse_id=grn.warehouse_id,
+                    movement_type='GRN',
                     quantity_in=item.accepted_qty,
                     quantity_out=0,
+                    batch_number=item.batch_number or '',
                     reference_id=grn.id,
-                    reference_type="GoodsReceipt",
-                    notes="Auto-posted from GRN"
+                    reference_type='GoodsReceipt',
                 )
 
     @staticmethod

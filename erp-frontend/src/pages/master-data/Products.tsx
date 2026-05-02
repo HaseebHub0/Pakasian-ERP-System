@@ -34,6 +34,8 @@ export const ProductsPage: React.FC = () => {
   const [editingProduct, setEditingProduct] = React.useState<any>(null);
   const [showNewCategoryInput, setShowNewCategoryInput] = React.useState(false);
   const [newCategory, setNewCategory] = React.useState('');
+  const [searchTerm, setSearchTerm] = React.useState('');
+  const [selectedCategory, setSelectedCategory] = React.useState('');
   const { user } = useAuthStore();
   const addLog = useAuditStore(state => state.addLog);
 
@@ -139,6 +141,14 @@ export const ProductsPage: React.FC = () => {
     toggleStatusMutation.mutate({ id: row.id, data: { status: newStatus } });
   };
 
+  const filteredProducts = products.filter((p: any) => {
+    const matchesSearch =
+      p.product_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      p.sku_code.toLowerCase().includes(searchTerm.toLowerCase());
+    const matchesCategory = !selectedCategory || p.category_id?.toString() === selectedCategory;
+    return matchesSearch && matchesCategory;
+  });
+
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
@@ -162,10 +172,14 @@ export const ProductsPage: React.FC = () => {
       <div className="bg-white p-4 rounded-xl border shadow-sm space-y-4">
         <div className="flex items-center justify-between gap-4">
           <div className="w-full max-w-md">
-            <SearchBar onSearch={(val) => console.log(val)} placeholder="Search by SKU or name..." />
+            <SearchBar onSearch={setSearchTerm} placeholder="Search by SKU or name..." />
           </div>
           <div className="flex items-center gap-2">
-            <select className="px-3 py-2 border rounded-md text-sm bg-white">
+            <select
+              value={selectedCategory}
+              onChange={(e) => setSelectedCategory(e.target.value)}
+              className="px-3 py-2 border rounded-md text-sm bg-white"
+            >
               <option value="">All Categories</option>
               {apiCategories.map((c: any) => (
                 <option key={c.id} value={c.id}>
@@ -201,8 +215,8 @@ export const ProductsPage: React.FC = () => {
                     onClick={() => handleToggleStatus(row)}
                     title={row.status === 'active' ? 'Mark Inactive' : 'Mark Active'}
                     className={`p-1 rounded ${
-                      row.status === 'active' 
-                        ? 'text-red-600 hover:bg-red-50' 
+                      row.status === 'active'
+                        ? 'text-red-600 hover:bg-red-50'
                         : 'text-green-600 hover:bg-green-50'
                     }`}
                   >
@@ -212,7 +226,7 @@ export const ProductsPage: React.FC = () => {
               )
             }
           ]}
-          data={products}
+          data={filteredProducts}
         />
       </div>
 

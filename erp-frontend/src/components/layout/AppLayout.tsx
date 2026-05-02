@@ -1,15 +1,14 @@
 import React from 'react';
 import { NavLink, useNavigate, useLocation } from 'react-router-dom';
-import { 
-  LayoutDashboard, 
-  Database, 
-  ShoppingCart, 
-  Package, 
-  Factory, 
-  Calculator, 
-  TrendingUp, 
-  DollarSign, 
-  Cpu, 
+import {
+  LayoutDashboard,
+  Database,
+  ShoppingCart,
+  Package,
+  Factory,
+  Calculator,
+  TrendingUp,
+  DollarSign,
   Activity,
   LogOut,
   Menu,
@@ -19,44 +18,84 @@ import {
   Bell,
   Search,
   ShieldCheck,
-  History
+  History,
+  Warehouse as WarehouseIcon,
+  BarChart3,
+  Settings
 } from 'lucide-react';
 import { useAuthStore } from '@/store/useAuthStore';
 import { cn } from '@/utils/cn';
 import { motion, AnimatePresence } from 'motion/react';
 import { hasPermission, Role } from '@/types/rbac';
 
+// 12 ERP Modules — each with its own collapsible sidebar section
 const navItems = [
+  // 1. Dashboard
   { label: 'Dashboard', icon: LayoutDashboard, path: '/dashboard', permission: 'dashboard' },
-  { 
-    label: 'Master Data', 
-    icon: Database, 
+
+  // 2. Master Data
+  {
+    label: 'Master Data',
+    icon: Database,
     permission: 'master-data:*',
     children: [
       { label: 'Products', path: '/master-data/products', permission: 'master-data:products' },
       { label: 'Raw Materials', path: '/master-data/raw-materials', permission: 'master-data:raw-materials' },
+      { label: 'Packaging Materials', path: '/master-data/packaging-materials', permission: 'master-data:packaging-materials' },
       { label: 'Suppliers', path: '/master-data/suppliers', permission: 'master-data:suppliers' },
+      { label: 'Customers', path: '/master-data/customers', permission: 'master-data:customers' },
       { label: 'Warehouses', path: '/master-data/warehouses', permission: 'master-data:warehouses' },
       { label: 'Machines', path: '/master-data/machines', permission: 'master-data:machines' },
-      { label: 'Customers', path: '/master-data/customers', permission: 'master-data:customers' },
-    ]
+    ],
   },
-  { 
-    label: 'Supply Chain', 
+
+  // 3. Procurement
+  {
+    label: 'Procurement',
     icon: ShoppingCart,
     permission: 'procurement:*',
     children: [
       { label: 'Requisitions', path: '/procurement/requisitions', permission: 'procurement:requisitions' },
+      { label: 'RFQ & Quotations', path: '/procurement/rfqs', permission: 'procurement:rfqs' },
       { label: 'Purchase Orders', path: '/procurement/purchase-orders', permission: 'procurement:purchase-orders' },
-      { label: 'GRN & QC', path: '/procurement/grn', permission: 'procurement:grn' },
+      { label: 'Goods Receipts (GRN)', path: '/procurement/grn', permission: 'procurement:grn' },
+      { label: 'QC Inspections', path: '/procurement/qc', permission: 'procurement:qc' },
+      { label: 'Raw Material Batches', path: '/procurement/raw-material-batches', permission: 'procurement:*' },
+      { label: 'Purchase Returns', path: '/procurement/purchase-returns', permission: 'procurement:*' },
+      { label: 'Supplier Materials', path: '/procurement/supplier-materials', permission: 'procurement:*' },
+      { label: 'Reorder Rules', path: '/procurement/reorder-rules', permission: 'procurement:*' },
+      { label: 'Accounts Payable', path: '/procurement/accounts-payable', permission: 'procurement:*' },
+      { label: 'Analytics', path: '/procurement/analytics', permission: 'procurement:*' },
+    ],
+  },
+
+  // 4. Inventory
+  {
+    label: 'Inventory',
+    icon: Package,
+    permission: 'inventory:*',
+    children: [
       { label: 'Stock Summary', path: '/inventory/stock', permission: 'inventory:stock' },
       { label: 'Inventory Ledger', path: '/inventory/ledger', permission: 'inventory:ledger' },
-      { label: 'Picking & Dispatch', path: '/warehouse/picking', permission: 'warehouse:picking' },
-      { label: 'Route Optimization', path: '/warehouse/route-optimization', permission: 'warehouse:route-optimization' },
-    ]
+    ],
   },
-  { 
-    label: 'Manufacturing', 
+
+  // 5. Warehouse
+  {
+    label: 'Warehouse',
+    icon: WarehouseIcon,
+    permission: 'warehouse:*',
+    children: [
+      { label: 'Picking Lists', path: '/warehouse/picking', permission: 'warehouse:picking' },
+      { label: 'Dispatch Orders', path: '/warehouse/dispatch', permission: 'warehouse:dispatch' },
+      { label: 'Stock Transfers', path: '/warehouse/transfers', permission: 'warehouse:transfers' },
+      { label: 'Route Optimization', path: '/warehouse/route-optimization', permission: 'warehouse:route-optimization' },
+    ],
+  },
+
+  // 6. Manufacturing
+  {
+    label: 'Manufacturing',
     icon: Factory,
     permission: 'manufacturing:*',
     children: [
@@ -64,11 +103,15 @@ const navItems = [
       { label: 'Batch Execution', path: '/manufacturing/batches', permission: 'manufacturing:batches' },
       { label: 'Batch Trace', path: '/manufacturing/trace', permission: 'manufacturing:trace' },
       { label: 'Production Optimization', path: '/manufacturing/optimization', permission: 'manufacturing:optimization' },
-      { label: 'MRP & Forecasting', path: '/mrp', permission: 'mrp' },
-    ]
+    ],
   },
-  { 
-    label: 'Sales & Marketing', 
+
+  // 7. MRP & Forecasting
+  { label: 'MRP & Forecasting', icon: BarChart3, path: '/mrp', permission: 'mrp' },
+
+  // 8. Sales
+  {
+    label: 'Sales',
     icon: TrendingUp,
     permission: 'sales:*',
     children: [
@@ -76,10 +119,24 @@ const navItems = [
       { label: 'Delivery Dispatch', path: '/sales/dispatch', permission: 'sales:dispatch' },
       { label: 'Sales Returns', path: '/sales/returns', permission: 'sales:returns' },
       { label: 'Incentives & Promotions', path: '/sales/incentives', permission: 'sales:incentives' },
-    ]
+    ],
   },
-  { 
-    label: 'Finance', 
+
+  // 9. Costing
+  {
+    label: 'Costing',
+    icon: Calculator,
+    permission: 'costing:*',
+    children: [
+      { label: 'Batch Costing', path: '/costing/batch-cost', permission: 'costing:batch-cost' },
+      { label: 'SKU Profitability', path: '/costing/profitability', permission: 'costing:profitability' },
+      { label: 'Process Costing', path: '/finance/costing', permission: 'finance:costing' },
+    ],
+  },
+
+  // 10. Finance
+  {
+    label: 'Finance',
     icon: DollarSign,
     permission: 'finance:*',
     children: [
@@ -87,14 +144,31 @@ const navItems = [
       { label: 'Chart of Accounts', path: '/finance/coa', permission: 'finance:coa' },
       { label: 'Accounts Payable', path: '/finance/payables', permission: 'finance:payables' },
       { label: 'Accounts Receivable', path: '/finance/receivables', permission: 'finance:receivables' },
-      { label: 'Batch Costing', path: '/costing/batch-cost', permission: 'costing:batch-cost' },
-      { label: 'SKU Profitability', path: '/costing/profitability', permission: 'costing:profitability' },
-      { label: 'Financial Reports', path: '/finance/pl-report', permission: 'finance:pl-report' },
-    ]
+      { label: 'P&L Report', path: '/finance/pl-report', permission: 'finance:pl-report' },
+      { label: 'Balance Sheet', path: '/finance/balance-sheet', permission: 'finance:pl-report' },
+    ],
   },
-  { label: 'IoT Fryer Monitor', icon: Activity, path: '/sensors/fryer-monitor', permission: 'sensors:fryer-monitor' },
-  { label: 'Approvals', icon: ShieldCheck, path: '/approvals', permission: 'dashboard' },
-  { label: 'Audit Logs', icon: History, path: '/audit-logs', permission: 'admin' },
+
+  // 11. IoT / Sensors
+  {
+    label: 'IoT & Sensors',
+    icon: Activity,
+    permission: 'sensors:fryer-monitor',
+    children: [
+      { label: 'Fryer Monitor', path: '/sensors/fryer-monitor', permission: 'sensors:fryer-monitor' },
+    ],
+  },
+
+  // 12. System / Admin
+  {
+    label: 'System',
+    icon: Settings,
+    permission: 'dashboard',
+    children: [
+      { label: 'Approvals', path: '/approvals', permission: 'dashboard' },
+      { label: 'Audit Logs', path: '/audit-logs', permission: 'admin' },
+    ],
+  },
 ];
 
 export const AppLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
@@ -152,12 +226,12 @@ export const AppLayout: React.FC<{ children: React.ReactNode }> = ({ children })
               <Factory size={22} className="text-white" />
             </div>
             {isSidebarOpen && (
-              <motion.span 
+              <motion.span
                 initial={{ opacity: 0, x: -10 }}
                 animate={{ opacity: 1, x: 0 }}
                 className="text-lg font-bold tracking-tight whitespace-nowrap"
               >
-                Pakistani Foods
+                Pakasian Foods
               </motion.span>
             )}
           </div>

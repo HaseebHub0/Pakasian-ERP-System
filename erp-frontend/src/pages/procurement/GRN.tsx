@@ -1,178 +1,183 @@
 import React from 'react';
-import { Plus, Package, MapPin, CheckCircle, Trash2 } from 'lucide-react';
+import { Plus, CheckCircle, Trash2 } from 'lucide-react';
 import { Table, Badge, Modal } from '@/components/ui/Shared';
-import { FormField } from '@/components/ui/Forms';
+import { SearchBar, FormField } from '@/components/ui/Forms';
 import { formatDate, getStatusColor } from '@/utils/formatters';
 import { useForm, FormProvider, useFieldArray } from 'react-hook-form';
 import toast from 'react-hot-toast';
-import { useProcurementStore, GRN } from '@/store/useProcurementStore';
-import { useAuthStore } from '@/store/useAuthStore';
-import { useAuditStore } from '@/store/useAuditStore';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { procurementAPI } from '@/api/procurement';
+import { masterDataAPI } from '@/api/masterData';
 
 export const GRNPage: React.FC = () => {
+  const queryClient = useQueryClient();
   const [isModalOpen, setIsModalOpen] = React.useState(false);
-  const { grns, addGRN, purchaseOrders, updatePOStatus } = useProcurementStore();
-  const { user } = useAuthStore();
-  const addLog = useAuditStore(state => state.addLog);
+  const [searchTerm, setSearchTerm] = React.useState('');
+
+  const { data: grns = [], isLoading } = useQuery({ queryKey: ['grns'], queryFn: procurementAPI.getGRNs });
+  const { data: pos = [] } = useQuery({ queryKey: ['purchase-orders'], queryFn: procurementAPI.getPurchaseOrders });
+  const { data: suppliers = [] } = useQuery({ queryKey: ['suppliers'], queryFn: masterDataAPI.getSuppliers });
+  const { data: warehouses = [] } = useQuery({ queryKey: ['warehouses'], queryFn: masterDataAPI.getWarehouses });
+  const { data: materials = [] } = useQuery({ queryKey: ['raw-materials'], queryFn: masterDataAPI.getRawMaterials });
+
+  const poOptions = pos.map((p: any) => ({ label: p.po_number, value: p.id }));
+  const supplierOptions = suppliers.map((s: any) => ({ label: s.supplier_name, value: s.id }));
+  const warehouseOptions = warehouses.map((w: any) => ({ label: w.warehouse_name, value: w.id }));
+  const materialOptions = materials.map((m: any) => ({ label: m.material_name, value: m.id }));
+
+  const createMutation = useMutation({
+    mutationFn: procurementAPI.createGRN,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['grns'] });
+      toast.success('GRN created');
+      setIsModalOpen(false);
+      methods.reset();
+    },
+    onError: (e: any) => toast.error(e?.response?.data?.detail || 'Create failed'),
+  });
+
+  const confirmMutation = useMutation({
+    mutationFn: procurementAPI.confirmGRN,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['grns'] });
+      queryClient.invalidateQueries({ queryKey: ['purchase-orders'] });
+      toast.success('GRN confirmed');
+    },
+    onError: (e: any) => toast.error(e?.response?.data?.error || 'Confirm failed'),
+  });
 
   const methods = useForm({
     defaultValues: {
-      poId: '',
-      deliveryChallan: '',
-      items: [{ materialId: '', materialName: '', orderedQty: 0, receivedQty: 0, acceptedQty: 0, rejectedQty: 0, binId: '', batchNumber: '' }]
-    }
+      po_id: '',
+      supplier_id: '',
+      warehouse_id: '',
+      received_date: new Date().toISOString().slice(0, 10),
+      items: [{ material_id: '', ordered_qty: '0', received_qty: '', accepted_qty: '0', rejected_qty: '0', batch_number: '' }],
+    },
   });
-
-  const { fields, replace } = useFieldArray({
-    control: methods.control,
-    name: "items"
-  });
-
-  const selectedPOId = methods.watch('poId');
-
-  React.useEffect(() => {
-    const po = purchaseOrders.find(p => p.id === selectedPOId);
-    if (po) {
-      replace(po.items.map(item => ({
-        materialId: item.materialId,
-        materialName: item.materialName,
-        orderedQty: item.quantity,
-        receivedQty: item.quantity,
-        acceptedQty: item.quantity,
-        rejectedQty: 0,
-        binId: 'A1',
-        batchNumber: `B-${new Date().getTime().toString().slice(-6)}`
-      })));
-    }
-  }, [selectedPOId, purchaseOrders, replace]);
+  const { fields, append, remove } = useFieldArray({ control: methods.control, name: 'items' });
 
   const onSubmit = (data: any) => {
-    if (!user) return;
-
-    const po = purchaseOrders.find(p => p.id === data.poId);
-    if (!po) return;
-
-    addGRN({
-      poId: data.poId,
-      supplierName: po.supplierName,
-      date: new Date().toISOString(),
-      deliveryChallan: data.deliveryChallan,
-      items: data.items.map((item: any) => ({
-        ...item,
-        receivedQty: parseFloat(item.receivedQty),
-        acceptedQty: parseFloat(item.acceptedQty),
-        rejectedQty: parseFloat(item.rejectedQty)
+    const payload = {
+      po_id: data.po_id || null,
+      supplier_id: data.supplier_id,
+      warehouse_id: data.warehouse_id,
+      received_date: data.received_date,
+      status: 'Draft',
+      items: data.items.map((i: any) => ({
+        material_id: i.material_id,
+        ordered_qty: parseFloat(i.ordered_qty || 0),
+        received_qty: parseFloat(i.received_qty || 0),
+        accepted_qty: parseFloat(i.accepted_qty || 0),
+        rejected_qty: parseFloat(i.rejected_qty || 0),
+        batch_number: i.batch_number || '',
       })),
-      receivedBy: user.name,
-    });
-
-    updatePOStatus(data.poId, 'Received');
-
-    addLog({
-      userId: user.id.toString(),
-      userName: user.name,
-      action: 'CREATE_GRN',
-      module: 'Procurement',
-      details: `Created GRN for PO ${data.poId} - Challan: ${data.deliveryChallan}`,
-      status: 'success'
-    });
-
-    toast.success('GRN Created successfully. QC Inspections triggered.');
-    toast.success('Automatic Journal Entry: Inventory Dr / Accounts Payable Cr', { icon: '📝' });
-    setIsModalOpen(false);
-    methods.reset();
+    };
+    createMutation.mutate(payload);
   };
+
+  const filtered = grns.filter((g: any) => g.grn_number?.toLowerCase().includes(searchTerm.toLowerCase()));
 
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h2 className="text-2xl font-bold text-gray-800">Goods Receipt Note (GRN)</h2>
-          <p className="text-sm text-gray-500">Record incoming material deliveries</p>
+          <h2 className="text-2xl font-bold text-gray-800">Goods Receipt Notes (GRN)</h2>
+          <p className="text-sm text-gray-500">Record materials received from suppliers</p>
         </div>
         <button onClick={() => setIsModalOpen(true)} className="btn btn-primary gap-2">
-          <Plus size={18} />
-          Receive Against PO
+          <Plus size={18} /> Create GRN
         </button>
       </div>
 
-      <div className="bg-white rounded-xl border shadow-sm overflow-hidden">
+      <div className="bg-white rounded-xl border shadow-sm">
+        <div className="p-4 border-b">
+          <SearchBar onSearch={setSearchTerm} placeholder="Search GRN number..." />
+        </div>
         <Table
           columns={[
-            { header: 'GRN Number', accessor: 'id' },
-            { header: 'PO Number', accessor: 'poId' },
-            { header: 'Supplier', accessor: 'supplierName' },
-            { header: 'Date', accessor: 'date', render: (val) => formatDate(val) },
-            { header: 'Items', accessor: 'items', render: (val) => val.length },
-            { 
-              header: 'Status', 
-              accessor: 'status', 
-              render: (val) => <Badge color={getStatusColor(val)}>{val}</Badge> 
+            { header: 'GRN Number', accessor: 'grn_number' },
+            { header: 'Received Date', accessor: 'received_date', render: (v) => formatDate(v) },
+            { header: 'Supplier', accessor: 'supplier_name' },
+            { header: 'PO', accessor: 'po_number', render: (v) => v || '—' },
+            { header: 'Items', accessor: 'items', render: (v) => (v ? v.length : 0) },
+            { header: 'Status', accessor: 'status', render: (v) => <Badge color={getStatusColor(v)}>{v}</Badge> },
+            {
+              header: 'Actions',
+              accessor: 'id',
+              render: (_, row) => (
+                <div className="flex items-center gap-1">
+                  {row.status === 'Draft' && (
+                    <button
+                      onClick={() => confirmMutation.mutate(row.id)}
+                      className="p-1 text-green-600 hover:bg-green-50 rounded"
+                      title="Confirm GRN"
+                    >
+                      <CheckCircle size={16} />
+                    </button>
+                  )}
+                </div>
+              ),
             },
           ]}
-          data={grns}
+          data={filtered}
         />
+        {isLoading && <p className="p-4 text-sm text-gray-500">Loading...</p>}
       </div>
 
-      <Modal
-        isOpen={isModalOpen}
-        onClose={() => setIsModalOpen(false)}
-        title="Receive Goods Against PO"
-        size="xl"
-      >
+      <Modal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} title="Create Goods Receipt" size="xl">
         <FormProvider {...methods}>
           <form onSubmit={methods.handleSubmit(onSubmit)} className="space-y-6">
-            <div className="grid grid-cols-2 gap-4">
-              <FormField 
-                name="poId" 
-                label="Select Purchase Order" 
-                type="select" 
-                options={purchaseOrders.filter(p => p.status === 'Sent' || p.status === 'Approved').map(p => ({
-                  label: `${p.id} (${p.supplierName})`,
-                  value: p.id
-                }))} 
-                required 
-              />
-              <FormField name="deliveryChallan" label="Delivery Challan #" placeholder="DC-..." required />
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+              <FormField name="po_id" label="Purchase Order" type="select" options={poOptions} />
+              <FormField name="supplier_id" label="Supplier" type="select" options={supplierOptions} required />
+              <FormField name="warehouse_id" label="Warehouse" type="select" options={warehouseOptions} required />
+              <FormField name="received_date" label="Received Date" type="date" required />
             </div>
 
-            <div className="space-y-4">
-              <h4 className="font-bold text-sm flex items-center gap-2">
-                <Package size={16} /> Material Lines
-              </h4>
-              <div className="space-y-3">
-                {fields.map((field, index) => (
-                  <div key={field.id} className="p-4 bg-gray-50 rounded-lg border space-y-4">
-                    <div className="flex items-center justify-between">
-                      <span className="font-bold text-primary">{field.materialName}</span>
-                      <span className="text-xs text-gray-500">Ordered: {field.orderedQty}</span>
-                    </div>
-                    <div className="grid grid-cols-4 gap-3">
-                      <FormField name={`items.${index}.receivedQty`} label="Received Qty" required />
-                      <FormField name={`items.${index}.acceptedQty`} label="Accepted Qty" required />
-                      <FormField name={`items.${index}.rejectedQty`} label="Rejected Qty" required />
-                      <FormField 
-                        name={`items.${index}.binId`} 
-                        label="Bin Location" 
-                        type="select"
-                        options={[
-                          { label: 'BIN-A1', value: 'A1' },
-                          { label: 'BIN-A2', value: 'A2' },
-                          { label: 'BIN-B1', value: 'B1' },
-                        ]}
-                        required 
-                      />
-                    </div>
-                    <FormField name={`items.${index}.batchNumber`} label="Batch Number" required />
+            <div className="space-y-3">
+              <h4 className="font-medium text-sm">Items</h4>
+              {fields.map((field, idx) => (
+                <div key={field.id} className="p-3 bg-gray-50 rounded border grid grid-cols-12 gap-2">
+                  <div className="col-span-3">
+                    <FormField name={`items.${idx}.material_id`} label="Material" type="select" options={materialOptions} required />
                   </div>
-                ))}
-              </div>
+                  <div className="col-span-2">
+                    <FormField name={`items.${idx}.received_qty`} label="Received Qty" required />
+                  </div>
+                  <div className="col-span-2">
+                    <FormField name={`items.${idx}.accepted_qty`} label="Accepted" />
+                  </div>
+                  <div className="col-span-2">
+                    <FormField name={`items.${idx}.rejected_qty`} label="Rejected" />
+                  </div>
+                  <div className="col-span-2">
+                    <FormField name={`items.${idx}.batch_number`} label="Batch #" />
+                  </div>
+                  <div className="col-span-1 flex items-end">
+                    <button type="button" onClick={() => remove(idx)} className="p-2 text-red-500 hover:bg-red-100 rounded">
+                      <Trash2 size={16} />
+                    </button>
+                  </div>
+                </div>
+              ))}
+              <button
+                type="button"
+                onClick={() =>
+                  append({ material_id: '', ordered_qty: '0', received_qty: '', accepted_qty: '0', rejected_qty: '0', batch_number: '' })
+                }
+                className="btn btn-outline btn-sm gap-2"
+              >
+                <Plus size={14} /> Add Item
+              </button>
             </div>
 
             <div className="flex justify-end gap-3 pt-4 border-t">
-              <button type="button" onClick={() => setIsModalOpen(false)} className="btn btn-outline">Cancel</button>
-              <button type="submit" className="btn btn-primary flex items-center gap-2">
-                <CheckCircle size={18} /> Complete GRN
+              <button type="button" onClick={() => setIsModalOpen(false)} className="btn btn-outline">
+                Cancel
+              </button>
+              <button type="submit" className="btn btn-primary" disabled={createMutation.isPending}>
+                Save GRN
               </button>
             </div>
           </form>

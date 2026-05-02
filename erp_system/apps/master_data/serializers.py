@@ -1,6 +1,6 @@
 from rest_framework import serializers
 from .models import (
-    Product, ProductCategory, RawMaterial, Supplier,
+    Product, ProductCategory, RawMaterial, PackagingMaterial, Supplier,
     Warehouse, WarehouseBin, Machine, ProductionLine,
 )
 
@@ -121,6 +121,19 @@ class WarehouseSerializer(serializers.ModelSerializer):
                     capacity=100.0
                 )
         return instance
+
+
+class PackagingMaterialSerializer(serializers.ModelSerializer):
+    supplier_name = serializers.CharField(source='supplier.supplier_name', read_only=True, default=None)
+
+    class Meta:
+        model = PackagingMaterial
+        fields = [
+            'id', 'material_code', 'material_name', 'material_type',
+            'unit_of_measure', 'standard_cost', 'safety_stock',
+            'reorder_level', 'current_stock', 'supplier', 'supplier_name',
+            'status', 'created_at', 'updated_at',
+        ]
 
 
 class WarehouseBinSerializer(serializers.ModelSerializer):
