@@ -8,9 +8,11 @@ import toast from 'react-hot-toast';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { procurementAPI } from '@/api/procurement';
 import { masterDataAPI } from '@/api/masterData';
+import { useRole } from '@/hooks/useRole';
 
 export const AccountsPayablePage: React.FC = () => {
   const queryClient = useQueryClient();
+  const { canMarkPaid } = useRole();
   const [isModalOpen, setIsModalOpen] = React.useState(false);
   const [searchTerm, setSearchTerm] = React.useState('');
 
@@ -88,7 +90,7 @@ export const AccountsPayablePage: React.FC = () => {
               header: 'Actions',
               accessor: 'id',
               render: (_, row) =>
-                row.status !== 'Paid' ? (
+                row.status !== 'Paid' && canMarkPaid ? (
                   <button onClick={() => payMutation.mutate(row.id)} className="p-1 text-green-600 hover:bg-green-50 rounded" title="Mark Paid">
                     <CheckCircle size={16} />
                   </button>

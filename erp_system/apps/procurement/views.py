@@ -7,6 +7,7 @@ from rest_framework.decorators import action, api_view, permission_classes
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 
+from apps.core.permissions import CanApproveProcurement, CanMarkPaid, CanManageWarehouse
 from apps.inventory.models import InventorySummary
 from .models import (
     ApprovalWorkflow, PaymentTerm,
@@ -111,7 +112,7 @@ class PurchaseRequisitionViewSet(viewsets.ModelViewSet):
             'data': PurchaseRequisitionSerializer(pr).data
         })
 
-    @action(detail=True, methods=['post'])
+    @action(detail=True, methods=['post'], permission_classes=[IsAuthenticated, CanApproveProcurement])
     def approve(self, request, pk=None):
         """Approve a submitted PR."""
         pr = self.get_object()
@@ -122,7 +123,7 @@ class PurchaseRequisitionViewSet(viewsets.ModelViewSet):
         pr.save(update_fields=['status', 'approval_status', 'updated_at'])
         return Response(PurchaseRequisitionSerializer(pr).data)
 
-    @action(detail=True, methods=['post'])
+    @action(detail=True, methods=['post'], permission_classes=[IsAuthenticated, CanApproveProcurement])
     def reject(self, request, pk=None):
         """Reject a submitted PR."""
         pr = self.get_object()
@@ -222,7 +223,7 @@ class PurchaseOrderViewSet(viewsets.ModelViewSet):
         instance.save(update_fields=['status', 'updated_at'])
         return Response({'message': f"PO {instance.po_number} cancelled."}, status=status.HTTP_200_OK)
 
-    @action(detail=True, methods=['post'])
+    @action(detail=True, methods=['post'], permission_classes=[IsAuthenticated, CanApproveProcurement])
     def approve(self, request, pk=None):
         po = self.get_object()
         if po.status != 'Draft':
@@ -253,7 +254,7 @@ class GoodsReceiptViewSet(viewsets.ModelViewSet):
             return GoodsReceiptWriteSerializer
         return GoodsReceiptSerializer
 
-    @action(detail=True, methods=['post'])
+    @action(detail=True, methods=['post'], permission_classes=[IsAuthenticated, CanManageWarehouse])
     def confirm(self, request, pk=None):
         """
         Confirm a Draft GRN
@@ -321,7 +322,7 @@ class AccountsPayableViewSet(viewsets.ModelViewSet):
     permission_classes = [IsAuthenticated]
     filterset_fields = ['status', 'supplier_id', 'po_id']
 
-    @action(detail=True, methods=['post'])
+    @action(detail=True, methods=['post'], permission_classes=[IsAuthenticated, CanMarkPaid])
     def mark_paid(self, request, pk=None):
         ap = self.get_object()
         if ap.status == 'Paid':

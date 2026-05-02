@@ -8,9 +8,11 @@ import toast from 'react-hot-toast';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { procurementAPI } from '@/api/procurement';
 import { masterDataAPI } from '@/api/masterData';
+import { useRole } from '@/hooks/useRole';
 
 export const RequisitionsPage: React.FC = () => {
   const queryClient = useQueryClient();
+  const { canApproveProcurement } = useRole();
   const [isModalOpen, setIsModalOpen] = React.useState(false);
   const [convertModalOpen, setConvertModalOpen] = React.useState(false);
   const [selectedPR, setSelectedPR] = React.useState<any>(null);
@@ -155,7 +157,7 @@ export const RequisitionsPage: React.FC = () => {
                       <Send size={16} />
                     </button>
                   )}
-                  {row.status === 'Submitted' && (
+                  {row.status === 'Submitted' && canApproveProcurement && (
                     <>
                       <button
                         onClick={() => approveMutation.mutate(row.id)}

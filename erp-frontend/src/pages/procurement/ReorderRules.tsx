@@ -1,5 +1,5 @@
 import React from 'react';
-import { Plus, Trash2, Edit2 } from 'lucide-react';
+import { Plus, Trash2, Edit2, RefreshCw } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { Table, Modal } from '@/components/ui/Shared';
 import { SearchBar, FormField } from '@/components/ui/Forms';
@@ -49,6 +49,19 @@ export const ReorderRulesPage: React.FC = () => {
       queryClient.invalidateQueries({ queryKey: ['reorder-rules'] });
       toast.success('Rule deleted');
     },
+  });
+
+  const checkReorderMutation = useMutation({
+    mutationFn: procurementAPI.checkReorder,
+    onSuccess: (data: any) => {
+      if (data?.pr_number) {
+        toast.success(`Stock low! PR auto-created: ${data.pr_number}`);
+        queryClient.invalidateQueries({ queryKey: ['purchase-requisitions'] });
+      } else {
+        toast.success(data?.message || 'Stock sufficient — no reorder needed');
+      }
+    },
+    onError: (e: any) => toast.error(e?.response?.data?.detail || 'Check failed'),
   });
 
   const methods = useForm({
@@ -116,6 +129,14 @@ export const ReorderRulesPage: React.FC = () => {
               accessor: 'id',
               render: (_, row) => (
                 <div className="flex items-center gap-1">
+                  <button
+                    onClick={() => checkReorderMutation.mutate(row.id)}
+                    className="p-1 text-amber-600 hover:bg-amber-50 rounded"
+                    title="Check Reorder (auto-creates PR if stock is low)"
+                    disabled={checkReorderMutation.isPending}
+                  >
+                    <RefreshCw size={16} />
+                  </button>
                   <button onClick={() => openEdit(row)} className="p-1 text-blue-600 hover:bg-blue-50 rounded">
                     <Edit2 size={16} />
                   </button>

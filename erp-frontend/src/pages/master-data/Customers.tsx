@@ -75,6 +75,7 @@ export const CustomersPage: React.FC = () => {
       city: '',
       credit_limit: '0',
       payment_terms: 'NET30',
+      delivery_priority: '3',
       lat: '',
       lng: ''
     }
@@ -132,6 +133,7 @@ export const CustomersPage: React.FC = () => {
       city: '',
       credit_limit: '0',
       payment_terms: 'NET30',
+      delivery_priority: '3',
       lat: '',
       lng: ''
     });
@@ -150,6 +152,7 @@ export const CustomersPage: React.FC = () => {
       city: customer.city || '',
       credit_limit: customer.credit_limit?.toString() || '0',
       payment_terms: customer.payment_terms || 'NET30',
+      delivery_priority: customer.delivery_priority?.toString() || '3',
       lat: customer.latitude || '',
       lng: customer.longitude || ''
     });
@@ -181,6 +184,7 @@ export const CustomersPage: React.FC = () => {
       longitude: data.lng ? parseFloat(data.lng) : null,
       credit_limit: parseFloat(data.credit_limit),
       payment_terms: data.payment_terms,
+      delivery_priority: parseInt(data.delivery_priority || '3', 10),
       status: 'active'
     };
     if (editingCustomer) {
@@ -384,6 +388,18 @@ export const CustomersPage: React.FC = () => {
                   type="select"
                   options={PAYMENT_TERMS_OPTIONS}
                   required
+                />
+                <FormField
+                  name="delivery_priority"
+                  label="Delivery Priority (1=Highest, 5=Lowest)"
+                  type="select"
+                  options={[
+                    { label: '1 — Highest (VIP)', value: '1' },
+                    { label: '2 — High', value: '2' },
+                    { label: '3 — Normal', value: '3' },
+                    { label: '4 — Low', value: '4' },
+                    { label: '5 — Lowest', value: '5' },
+                  ]}
                 />
                 <div className="grid grid-cols-2 gap-2">
                   <FormField name="lat" label="Latitude" type="number" step="any" placeholder="31.5204" />

@@ -8,9 +8,11 @@ import toast from 'react-hot-toast';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { procurementAPI } from '@/api/procurement';
 import { masterDataAPI } from '@/api/masterData';
+import { useRole } from '@/hooks/useRole';
 
 export const PurchaseOrdersPage: React.FC = () => {
   const queryClient = useQueryClient();
+  const { canApproveProcurement } = useRole();
   const [isModalOpen, setIsModalOpen] = React.useState(false);
   const [searchTerm, setSearchTerm] = React.useState('');
 
@@ -131,13 +133,15 @@ export const PurchaseOrdersPage: React.FC = () => {
                 <div className="flex items-center gap-1">
                   {row.status === 'Draft' && (
                     <>
-                      <button
-                        onClick={() => approveMutation.mutate(row.id)}
-                        className="p-1 text-green-600 hover:bg-green-50 rounded"
-                        title="Approve"
-                      >
-                        <CheckCircle size={16} />
-                      </button>
+                      {canApproveProcurement && (
+                        <button
+                          onClick={() => approveMutation.mutate(row.id)}
+                          className="p-1 text-green-600 hover:bg-green-50 rounded"
+                          title="Approve"
+                        >
+                          <CheckCircle size={16} />
+                        </button>
+                      )}
                       <button
                         onClick={() => deleteMutation.mutate(row.id)}
                         className="p-1 text-red-600 hover:bg-red-50 rounded"
