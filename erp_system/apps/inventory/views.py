@@ -6,7 +6,7 @@ from django.shortcuts import get_object_or_404
 from django.db import transaction
 from .models import (
     InventoryLedger, BatchTable, InventorySummary, StockTransfer,
-    TransferItem, StockReservation, WarehousePicking, PickingItem, InventoryAdjustment
+    StockReservation, WarehousePicking, InventoryAdjustment
 )
 from .serializers import (
     InventoryLedgerSerializer, BatchTableSerializer, InventorySummarySerializer,
@@ -37,7 +37,7 @@ def batch_trace(request, batch_number):
         ProductionYield, OilConsumptionLog, BatchCostSummary,
     )
     from apps.manufacturing.serializers import (
-        ProductionBatchSerializer, MaterialIssueSerializer, BatchStageLogSerializer,
+        MaterialIssueSerializer, BatchStageLogSerializer,
         ProductionYieldSerializer, OilConsumptionLogSerializer, BatchCostSummarySerializer,
     )
 

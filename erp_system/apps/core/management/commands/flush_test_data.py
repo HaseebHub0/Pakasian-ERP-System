@@ -7,7 +7,6 @@ Usage:
     python manage.py flush_test_data --noinput   (skip confirmation prompt)
 """
 
-import sys
 from django.core.management.base import BaseCommand
 from django.db import connection, transaction
 

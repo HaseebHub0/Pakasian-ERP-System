@@ -39,12 +39,12 @@ class CostingService:
             OilConsumptionLog, MachineLog, ProductionWaste,
             ProductionOutput,
         )
-        from apps.master_data.models import Product
+        
         from .models import (
             BatchMaterialCost, LabourLog, MachineCostRate,
             BatchMachineCost, FactoryOverhead, BatchOverheadCost,
             BatchWasteCost, BatchCostSummary, UnitCost,
-            CostVariance, SKUProfitability,
+            CostVariance,
         )
 
         batch = ProductionBatch.objects.select_related('product_id').get(pk=batch_id)

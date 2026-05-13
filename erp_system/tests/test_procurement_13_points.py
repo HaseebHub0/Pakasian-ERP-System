@@ -48,7 +48,9 @@ from apps.inventory.models import InventoryLedger
 @pytest.fixture
 def api(db):
     """Authenticated API client (generic staff user)."""
-    user = SystemUser.objects.create_user(username='p13_user', password='test123')
+    from apps.authentication.models import Role
+    role, _ = Role.objects.get_or_create(role_name='admin')
+    user = SystemUser.objects.create_user(username='p13_user', password='test123', role_id=role)
     client = APIClient()
     client.force_authenticate(user=user)
     client.user = user

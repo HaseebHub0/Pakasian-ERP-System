@@ -1,8 +1,6 @@
-import uuid
 import datetime
 from decimal import Decimal
 from django.db import models
-from django.utils import timezone
 from apps.core.models import BaseModel
 
 

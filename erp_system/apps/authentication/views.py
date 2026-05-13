@@ -1,6 +1,5 @@
 from datetime import timedelta
 from django.utils import timezone
-from django.contrib.auth import authenticate
 from rest_framework import status
 from rest_framework.views import APIView
 from rest_framework.response import Response
@@ -99,7 +98,7 @@ class RefreshTokenView(APIView):
             return Response({
                 'access_token': new_access_token,
             }, status=status.HTTP_200_OK)
-        except (TokenError, SystemUser.DoesNotExist) as e:
+        except (TokenError, SystemUser.DoesNotExist):
             return Response({'error': 'Invalid or expired token'}, status=status.HTTP_401_UNAUTHORIZED)
 
 class CurrentUserView(APIView):

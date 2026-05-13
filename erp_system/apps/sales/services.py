@@ -62,8 +62,6 @@ class SalesService:
         Returns the saved SalesOrder instance.
         """
         from .models import SalesOrder, SalesOrderItem
-        from apps.master_data.models import Warehouse
-        from apps.master_data.models import Product
 
         order = SalesOrder.objects.create(
             order_number = order_number,
@@ -132,7 +130,7 @@ class SalesService:
     # ─────────────────────────────────────────────────────────────────────────
     @staticmethod
     @transaction.atomic
-    def approve_order(order_id: str) -> 'SalesOrder':
+    def approve_order(order_id: str):
         """
         Runs credit check then moves status Draft → Confirmed → Approved.
         Raises ValueError if credit is insufficient or order is not in Draft/Confirmed.
@@ -177,7 +175,7 @@ class SalesService:
         and moves SalesOrder → Dispatched.
         Returns the saved DispatchOrder.
         """
-        from .models import SalesOrder, DispatchOrder, DispatchItem, CustomerCreditLedger
+        from .models import SalesOrder, DispatchOrder, DispatchItem
 
         order = SalesOrder.objects.select_related('customer_id').get(pk=order_id)
         if order.order_status != 'Approved':

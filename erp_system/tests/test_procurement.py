@@ -25,7 +25,9 @@ from apps.procurement.models import (
 
 @pytest.fixture
 def api(db):
-    user = SystemUser.objects.create_user(username='proc_test', password='pw12345')
+    from apps.authentication.models import Role
+    role, _ = Role.objects.get_or_create(role_name='admin')
+    user = SystemUser.objects.create_user(username='proc_test', password='pw12345', role_id=role)
     client = APIClient()
     client.force_authenticate(user=user)
     client.user = user

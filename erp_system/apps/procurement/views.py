@@ -1,6 +1,6 @@
 from decimal import Decimal
 from django.db import transaction
-from django.db.models import Sum, Count, Avg, Q
+from django.db.models import Sum, Count, Avg
 from django.utils import timezone
 from rest_framework import viewsets, status
 from rest_framework.decorators import action, api_view, permission_classes
@@ -15,7 +15,7 @@ from .models import (
     PurchaseRequisition, PurchaseRequisitionItem,
     RequestForQuotation, Quotation,
     PurchaseOrder, PurchaseOrderItem,
-    GoodsReceipt, GoodsReceiptItem,
+    GoodsReceipt,
     RawMaterialBatch, QcInspection,
     PurchaseReturn, AccountsPayable, ReorderRule,
 )
@@ -26,9 +26,7 @@ from .serializers import (
     PurchaseRequisitionItemSerializer,
     RequestForQuotationSerializer, QuotationSerializer,
     PurchaseOrderSerializer, PurchaseOrderWriteSerializer,
-    PurchaseOrderItemSerializer,
     GoodsReceiptSerializer, GoodsReceiptWriteSerializer,
-    GoodsReceiptItemSerializer,
     RawMaterialBatchSerializer, QcInspectionSerializer,
     PurchaseReturnSerializer, AccountsPayableSerializer,
     ReorderRuleSerializer,
